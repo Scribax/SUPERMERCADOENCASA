@@ -156,15 +156,15 @@ export default function Navbar() {
           </Link>
 
           {/* Locality Selector */}
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#4B5563', cursor: 'pointer', backgroundColor: '#F3F4F6', padding: '8px 12px', borderRadius: '8px' }}>
-            <span>📍</span>
-            <span style={{ fontWeight: 'bold' }}>Enviar a: Pigué</span>
-            <ChevronDown size={14} />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#334155', cursor: 'pointer', backgroundColor: '#F1F5F9', padding: '8px 14px', borderRadius: '20px', border: '1px solid #E2E8F0' }}>
+            <span style={{ fontSize: '14px' }}>📍</span>
+            <span>Enviar a: <strong style={{ color: '#0F4C81' }}>Pigué</strong></span>
+            <ChevronDown size={14} style={{ color: '#64748B' }} />
           </div>
 
           {/* Search Bar */}
           <div ref={searchRef} style={{ flex: 1, minWidth: '300px', position: 'relative' }}>
-            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', width: '100%', height: '44px' }}>
+            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', width: '100%', height: '42px' }}>
               <input
                 type="text"
                 placeholder="Buscar marcas, productos y más..."
@@ -176,19 +176,21 @@ export default function Navbar() {
                 style={{
                   flex: 1,
                   padding: '0 16px',
-                  border: '2px solid #0A2540',
+                  border: '1px solid #CBD5E1',
                   borderRight: 'none',
                   borderRadius: '8px 0 0 8px',
                   fontSize: '14px',
                   outline: 'none',
+                  backgroundColor: '#FFFFFF',
+                  color: '#1E293B',
                 }}
               />
               <button
                 type="submit"
                 style={{
-                  backgroundColor: '#0A2540',
-                  color: 'white',
-                  padding: '0 24px',
+                  backgroundColor: '#0F4C81',
+                  color: '#FFFFFF',
+                  padding: '0 22px',
                   border: 'none',
                   borderRadius: '0 8px 8px 0',
                   cursor: 'pointer',
@@ -197,7 +199,7 @@ export default function Navbar() {
                   justifyContent: 'center',
                 }}
               >
-                <Search size={20} />
+                <Search size={18} />
               </button>
             </form>
 
