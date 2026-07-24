@@ -126,6 +126,7 @@ model Order {
   total           Float
   couponCode      String?
   shippingAddress String
+  locality        String?
   billingAddress  String?
   paymentMethod   String      // MERCADO_PAGO, TRANSFER, CASH
   paymentStatus   String      @default("PENDING") // PENDING, PAID, REFUNDED, FAILED
@@ -136,6 +137,15 @@ model Order {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   items           OrderItem[]
+}
+
+model Locality {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  shippingCost Float    @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model OrderItem {

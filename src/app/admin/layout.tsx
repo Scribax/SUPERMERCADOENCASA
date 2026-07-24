@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
-import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Percent, Settings, Bookmark, LogOut, ArrowLeft, Loader2, Home, Image as ImageIcon } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Percent, Settings, Bookmark, LogOut, ArrowLeft, Loader2, Home, Image as ImageIcon, MapPin } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
@@ -124,6 +124,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
           >
             <Bookmark size={18} /> Categorías
+          </Link>
+          <Link
+            href="/admin/localidades"
+            style={{
+              padding: '12px 16px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '14px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              color: 'var(--foreground)',
+              transition: 'background var(--transition-fast)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--background-alt)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <MapPin size={18} /> Localidades
           </Link>
           <Link
             href="/admin/marcas"

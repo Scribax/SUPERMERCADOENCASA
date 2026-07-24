@@ -10,9 +10,18 @@ export async function GET(request: NextRequest) {
     }
 
     let orders;
+    const { searchParams } = new URL(request.url);
+    const locality = searchParams.get('locality');
+
+    const whereClause: any = {};
+    if (locality) {
+      whereClause.locality = locality;
+    }
+
     if (user.role === 'ADMIN' || user.role === 'EMPLOYEE') {
       // Admins and employees see all orders
       orders = await prisma.order.findMany({
+        where: whereClause,
         orderBy: { createdAt: 'desc' },
         include: {
           items: true,
@@ -21,7 +30,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Clients see only their own orders
       orders = await prisma.order.findMany({
-        where: { userId: user.id },
+        where: { ...whereClause, userId: user.id },
         orderBy: { createdAt: 'desc' },
         include: {
           items: true,
@@ -53,6 +62,7 @@ export async function POST(request: NextRequest) {
       customerEmail,
       customerPhone,
       shippingAddress,
+      locality,
       paymentMethod, // MERCADO_PAGO, TRANSFER, CASH
     } = body;
 
@@ -166,11 +176,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5. Fetch shipping rules from StoreConfig
+    // 5. Fetch shipping rules from StoreConfig and Locality
     const shippingCostConfig = await prisma.storeConfig.findUnique({ where: { key: 'shipping_cost' } });
     const freeShippingConfig = await prisma.storeConfig.findUnique({ where: { key: 'free_shipping_threshold' } });
 
-    const configShippingCost = parseFloat(shippingCostConfig?.value || '0');
+    let configShippingCost = parseFloat(shippingCostConfig?.value || '0');
+    if (locality) {
+      const dbLocality = await prisma.locality.findUnique({ where: { name: locality } });
+      if (dbLocality && dbLocality.isActive) {
+        configShippingCost = dbLocality.shippingCost;
+      }
+    }
+
     const configFreeShippingThreshold = parseFloat(freeShippingConfig?.value || '0');
 
     const totalBeforeShipping = subtotal - promoDiscount - couponDiscount;
@@ -190,6 +207,7 @@ export async function POST(request: NextRequest) {
           total,
           couponCode: validatedCouponCode,
           shippingAddress,
+          locality: locality || null,
           paymentMethod,
           paymentStatus: paymentMethod === 'CASH' ? 'PENDING' : 'PENDING', // PENDING initially, paid via MP redirect or manual transfer later
           customerName,

@@ -24,7 +24,10 @@ export default function CheckoutPage() {
     ciudad: '',
     provincia: '',
     zip: '',
+    localidadId: '',
   });
+
+  const [localities, setLocalities] = useState<any[]>([]);
 
   const [paymentMethod, setPaymentMethod] = useState<'MERCADO_PAGO' | 'TRANSFER' | 'CASH'>('MERCADO_PAGO');
   const [submitting, setSubmitting] = useState(false);
@@ -69,6 +72,21 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    const fetchLocalities = async () => {
+      try {
+        const res = await fetch('/api/localities');
+        if (res.ok) {
+          const data = await res.json();
+          setLocalities((data.localities || []).filter((l: any) => l.isActive));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchLocalities();
+  }, []);
+
   // If cart is empty, redirect back to products
   useEffect(() => {
     if (cart.length === 0 && !submitting) {
@@ -77,7 +95,7 @@ export default function CheckoutPage() {
     }
   }, [cart, router, toast, submitting]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -100,6 +118,7 @@ export default function CheckoutPage() {
         customerEmail: formData.email,
         customerPhone: formData.telefono,
         shippingAddress: `${formData.direccion}, ${formData.ciudad}, ${formData.provincia} (CP: ${formData.zip})`,
+        locality: localities.find(l => l.id === formData.localidadId)?.name || null,
         paymentMethod,
       };
 
@@ -231,6 +250,23 @@ export default function CheckoutPage() {
                 style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
               />
             </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Localidad de Entrega (Zonas Habilitadas)</label>
+              <select
+                name="localidadId"
+                value={formData.localidadId}
+                onChange={handleInputChange}
+                required
+                style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
+              >
+                <option value="">Seleccione una localidad...</option>
+                {localities.map(loc => (
+                  <option key={loc.id} value={loc.id}>{loc.name} - Envío ${loc.shippingCost.toFixed(2)}</option>
+                ))}
+              </select>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Ciudad / Localidad</label>
@@ -440,38 +476,52 @@ export default function CheckoutPage() {
             <hr style={{ border: 'none', borderTop: '1px solid var(--border)' }} />
 
             {/* Totals */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
+            {(() => {
+              const selectedLocality = localities.find(l => l.id === formData.localidadId);
+              // Use dynamic shipping cost if a locality is selected, otherwise fallback to the cart's default
+              const finalShippingCost = selectedLocality ? selectedLocality.shippingCost : shippingCost;
+              const totalBeforeShipping = subtotal - promoDiscount - couponDiscount;
+              // Assume free shipping if cost is 0 or if the cart logic sets shippingCost to 0 indicating free shipping threshold was met.
+              // Wait, if cart says shipping is 0, we should preserve that if free shipping was applied.
+              // But for simplicity, we'll just use the locality cost, or free if locality cost is 0.
+              const dynamicFinalShippingCost = (shippingCost === 0 && finalShippingCost > 0) ? 0 : finalShippingCost; 
+              const finalTotal = totalBeforeShipping + dynamicFinalShippingCost;
 
-              {promoDiscount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--success)' }}>
-                  <span>Descuento Promociones</span>
-                  <span>-${promoDiscount.toFixed(2)}</span>
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+
+                  {promoDiscount > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--success)' }}>
+                      <span>Descuento Promociones</span>
+                      <span>-${promoDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {couponDiscount > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--success)' }}>
+                      <span>Descuento Cupón</span>
+                      <span>-${couponDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Costo de Envío</span>
+                    <span>{dynamicFinalShippingCost === 0 ? <strong style={{ color: 'var(--success)' }}>Gratis</strong> : `$${dynamicFinalShippingCost.toFixed(2)}`}</span>
+                  </div>
+
+                  <hr style={{ border: 'none', borderTop: '1px solid var(--border-light)', margin: '4px 0' }} />
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: '800' }}>
+                    <span>Total</span>
+                    <span style={{ color: 'var(--primary)' }}>${finalTotal.toFixed(2)}</span>
+                  </div>
                 </div>
-              )}
-
-              {couponDiscount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--success)' }}>
-                  <span>Descuento Cupón</span>
-                  <span>-${couponDiscount.toFixed(2)}</span>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Costo de Envío</span>
-                <span>{shippingCost === 0 ? <strong style={{ color: 'var(--success)' }}>Gratis</strong> : `$${shippingCost.toFixed(2)}`}</span>
-              </div>
-
-              <hr style={{ border: 'none', borderTop: '1px solid var(--border-light)', margin: '4px 0' }} />
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: '800' }}>
-                <span>Total</span>
-                <span style={{ color: 'var(--primary)' }}>${total.toFixed(2)}</span>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Buy / Submit button */}
             <button

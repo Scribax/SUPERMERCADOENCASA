@@ -2,16 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/Toast';
-import { Eye, ChevronDown, ChevronUp, Printer, Phone, Check } from 'lucide-react';
+import { Eye, ChevronUp, Printer, Phone, MapPin, X } from 'lucide-react';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+  const [localities, setLocalities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [localityFilter, setLocalityFilter] = useState('ALL');
+
+  // Manifest Modal State
+  const [isManifestOpen, setIsManifestOpen] = useState(false);
+  const [manifestLocality, setManifestLocality] = useState('');
+  const [manifestStatus, setManifestStatus] = useState('PENDING');
 
   const toast = useToast();
 
@@ -31,18 +38,34 @@ export default function AdminOrders() {
     }
   };
 
+  const fetchLocalities = async () => {
+    try {
+      const res = await fetch('/api/localities');
+      if (res.ok) {
+        const data = await res.json();
+        setLocalities(data.localities || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
+    fetchLocalities();
   }, []);
 
   // Filter local array when filter updates
   useEffect(() => {
-    if (statusFilter === 'ALL') {
-      setFilteredOrders(orders);
-    } else {
-      setFilteredOrders(orders.filter((o) => o.status === statusFilter));
+    let result = orders;
+    if (statusFilter !== 'ALL') {
+      result = result.filter((o) => o.status === statusFilter);
     }
-  }, [statusFilter, orders]);
+    if (localityFilter !== 'ALL') {
+      result = result.filter((o) => o.locality === localityFilter);
+    }
+    setFilteredOrders(result);
+  }, [statusFilter, localityFilter, orders]);
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
@@ -113,6 +136,22 @@ export default function AdminOrders() {
     }
   };
 
+  // Generate Manifest Data
+  const manifestOrders = orders.filter(
+    (o) => o.locality === manifestLocality && o.status === manifestStatus
+  );
+
+  const consolidatedItems = manifestOrders.reduce((acc, order) => {
+    order.items.forEach((item: any) => {
+      if (acc[item.name]) {
+        acc[item.name] += item.quantity;
+      } else {
+        acc[item.name] = item.quantity;
+      }
+    });
+    return acc;
+  }, {} as Record<string, number>);
+
   if (loading) {
     return <div>Cargando pedidos...</div>;
   }
@@ -120,13 +159,32 @@ export default function AdminOrders() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }} className="admin-orders-page">
       {/* Header */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }} className="no-print">
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }} className="no-print">
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '800' }}>Gestión de Pedidos</h1>
           <p style={{ color: 'var(--foreground-muted)' }}>Visualizá, prepará y actualizá los pedidos de tus clientes.</p>
         </div>
+        
+        <button
+          onClick={() => setIsManifestOpen(true)}
+          style={{
+            backgroundColor: 'var(--primary)',
+            color: 'white',
+            padding: '10px 20px',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: '14px',
+            fontWeight: '700',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <Printer size={16} /> Hoja de Ruta por Localidad
+        </button>
+      </div>
 
-        {/* Filters */}
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }} className="no-print">
         <div style={{ display: 'flex', gap: '8px' }}>
           {['ALL', 'PENDING', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map((status) => (
             <button
@@ -146,21 +204,42 @@ export default function AdminOrders() {
             </button>
           ))}
         </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <MapPin size={16} style={{ color: 'var(--foreground-muted)' }} />
+          <select
+            value={localityFilter}
+            onChange={(e) => setLocalityFilter(e.target.value)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              backgroundColor: 'var(--card-bg)',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}
+          >
+            <option value="ALL">Todas las localidades</option>
+            {localities.map(loc => (
+              <option key={loc.id} value={loc.name}>{loc.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Orders Table */}
-      <div style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
+      <div style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }} className="no-print">
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left', color: 'var(--foreground-muted)' }}>
                 <th style={{ padding: '16px' }}>Pedido</th>
                 <th style={{ padding: '16px' }}>Cliente</th>
-                <th style={{ padding: '16px' }}>Fecha</th>
+                <th style={{ padding: '16px' }}>Localidad</th>
                 <th style={{ padding: '16px' }}>Total</th>
                 <th style={{ padding: '16px' }}>Estado</th>
                 <th style={{ padding: '16px' }}>Pago</th>
-                <th style={{ padding: '16px', textAlign: 'right' }} className="no-print">Acciones</th>
+                <th style={{ padding: '16px', textAlign: 'right' }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -174,7 +253,7 @@ export default function AdminOrders() {
                         <div><strong>{order.customerName}</strong></div>
                         <div style={{ fontSize: '12px', color: 'var(--foreground-muted)' }}>{order.customerPhone}</div>
                       </td>
-                      <td style={{ padding: '16px' }}>{new Date(order.createdAt).toLocaleDateString('es-AR')}</td>
+                      <td style={{ padding: '16px' }}>{order.locality || '-'}</td>
                       <td style={{ padding: '16px', fontWeight: '700', color: 'var(--primary)' }}>${order.total.toFixed(2)}</td>
                       
                       {/* Status select dropdown */}
@@ -190,7 +269,6 @@ export default function AdminOrders() {
                             fontSize: '12px',
                             fontWeight: '600',
                           }}
-                          className="no-print"
                         >
                           <option value="PENDING">Pendiente</option>
                           <option value="PREPARING">Preparando</option>
@@ -198,7 +276,6 @@ export default function AdminOrders() {
                           <option value="DELIVERED">Entregado</option>
                           <option value="CANCELLED">Cancelado</option>
                         </select>
-                        <span style={{ display: 'none' }} className="print-only">{translateStatus(order.status)}</span>
                       </td>
 
                       {/* Payment Status select dropdown */}
@@ -214,17 +291,15 @@ export default function AdminOrders() {
                             fontSize: '12px',
                             fontWeight: '600',
                           }}
-                          className="no-print"
                         >
                           <option value="PENDING">Pendiente</option>
                           <option value="PAID">Pagado</option>
                           <option value="REFUNDED">Reembolsado</option>
                         </select>
-                        <span style={{ display: 'none' }} className="print-only">{order.paymentStatus}</span>
                       </td>
 
                       {/* Expand / Actions */}
-                      <td style={{ padding: '16px', textAlign: 'right' }} className="no-print">
+                      <td style={{ padding: '16px', textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                           <button
                             onClick={() => toggleExpand(order.id)}
@@ -266,25 +341,7 @@ export default function AdminOrders() {
                               <p style={{ margin: '4px 0' }}><strong>Dirección:</strong> {order.shippingAddress}</p>
                               <p style={{ margin: '4px 0' }}><strong>Email:</strong> {order.customerEmail}</p>
                               <p style={{ margin: '4px 0' }}><strong>Pago:</strong> {order.paymentMethod} ({order.paymentStatus === 'PAID' ? 'Acreditado' : 'Pendiente'})</p>
-                              
-                              <button
-                                onClick={() => window.print()}
-                                style={{
-                                  marginTop: '16px',
-                                  padding: '8px 16px',
-                                  backgroundColor: 'var(--card-bg)',
-                                  border: '1px solid var(--border)',
-                                  borderRadius: 'var(--radius-sm)',
-                                  fontSize: '13px',
-                                  fontWeight: '600',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px',
-                                }}
-                                className="no-print"
-                              >
-                                <Printer size={15} /> Imprimir Remito de Despacho
-                              </button>
+                              <p style={{ margin: '4px 0' }}><strong>Fecha:</strong> {new Date(order.createdAt).toLocaleString('es-AR')}</p>
                             </div>
 
                             {/* Right: Items */}
@@ -325,14 +382,170 @@ export default function AdminOrders() {
         </div>
       </div>
 
+      {/* Manifest Modal */}
+      {isManifestOpen && (
+        <div className="manifest-modal">
+          <div className="no-print" onClick={() => setIsManifestOpen(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000 }} />
+          
+          <div
+            className="manifest-content"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '95%',
+              maxWidth: '900px',
+              height: '90vh',
+              backgroundColor: 'white',
+              color: 'black',
+              zIndex: 1001,
+              padding: '30px',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: 'var(--shadow-xl)',
+              overflowY: 'auto',
+            }}
+          >
+            <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <select
+                  value={manifestLocality}
+                  onChange={(e) => setManifestLocality(e.target.value)}
+                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                  <option value="">Seleccionar Localidad</option>
+                  {localities.map(loc => (
+                    <option key={loc.id} value={loc.name}>{loc.name}</option>
+                  ))}
+                </select>
+                <select
+                  value={manifestStatus}
+                  onChange={(e) => setManifestStatus(e.target.value)}
+                  style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                  <option value="PENDING">Pendientes</option>
+                  <option value="PREPARING">Preparando</option>
+                </select>
+                <button
+                  onClick={() => window.print()}
+                  disabled={!manifestLocality || manifestOrders.length === 0}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: 'var(--primary)',
+                    color: 'white',
+                    borderRadius: '4px',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: (!manifestLocality || manifestOrders.length === 0) ? 'not-allowed' : 'pointer',
+                    opacity: (!manifestLocality || manifestOrders.length === 0) ? 0.5 : 1
+                  }}
+                >
+                  <Printer size={16} /> Imprimir Hoja de Ruta
+                </button>
+              </div>
+              <button onClick={() => setIsManifestOpen(false)}><X size={24} /></button>
+            </div>
+
+            {manifestLocality ? (
+              <div className="print-area">
+                <div style={{ borderBottom: '2px solid black', paddingBottom: '10px', marginBottom: '20px' }}>
+                  <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, textTransform: 'uppercase' }}>Hoja de Ruta y Despacho de Entrega</h2>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                    <p style={{ margin: 0, fontSize: '16px' }}><strong>Localidad:</strong> {manifestLocality}</p>
+                    <p style={{ margin: 0, fontSize: '16px' }}><strong>Fecha y Hora:</strong> {new Date().toLocaleString('es-AR')}</p>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '30px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', borderBottom: '1px solid #ccc', paddingBottom: '5px', marginBottom: '10px' }}>Sección 1: Listado de Entregas y Cobros</h3>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '2px solid #ccc' }}>
+                        <th style={{ padding: '8px', textAlign: 'left', border: '1px solid #ddd' }}>#Pedido</th>
+                        <th style={{ padding: '8px', textAlign: 'left', border: '1px solid #ddd' }}>Cliente</th>
+                        <th style={{ padding: '8px', textAlign: 'left', border: '1px solid #ddd' }}>Dirección Exacta</th>
+                        <th style={{ padding: '8px', textAlign: 'left', border: '1px solid #ddd' }}>Teléfono</th>
+                        <th style={{ padding: '8px', textAlign: 'left', border: '1px solid #ddd' }}>Método</th>
+                        <th style={{ padding: '8px', textAlign: 'left', border: '1px solid #ddd' }}>Est. Pago</th>
+                        <th style={{ padding: '8px', textAlign: 'right', border: '1px solid #ddd' }}>Total a Cobrar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {manifestOrders.map(o => {
+                        const isCashPending = (o.paymentMethod === 'CASH' || o.paymentMethod === 'TRANSFER') && o.paymentStatus === 'PENDING';
+                        return (
+                          <tr key={o.id}>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>#{o.id.slice(0, 8)}</td>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.customerName}</td>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.shippingAddress}</td>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.customerPhone}</td>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.paymentMethod}</td>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.paymentStatus === 'PAID' ? 'Acreditado' : 'Pendiente'}</td>
+                            <td style={{ 
+                              padding: '8px', 
+                              border: '1px solid #ddd', 
+                              textAlign: 'right', 
+                              fontWeight: 'bold',
+                              backgroundColor: isCashPending ? '#ffebee' : 'transparent',
+                              WebkitPrintColorAdjust: 'exact',
+                              printColorAdjust: 'exact'
+                            }}>
+                              ${o.total.toFixed(2)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {manifestOrders.length === 0 && (
+                        <tr><td colSpan={7} style={{ padding: '20px', textAlign: 'center', border: '1px solid #ddd' }}>No hay pedidos {translateStatus(manifestStatus).toLowerCase()} en {manifestLocality}.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', borderBottom: '1px solid #ccc', paddingBottom: '5px', marginBottom: '10px' }}>Sección 2: Resumen Consolidado de Carga para Vehículo</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', fontSize: '13px' }}>
+                    {Object.entries(consolidatedItems).map(([name, qty]) => (
+                      <div key={name} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px', borderBottom: '1px dashed #eee' }}>
+                        <span>{name}</span>
+                        <strong style={{ fontSize: '14px' }}>x {String(qty)}</strong>
+                      </div>
+                    ))}
+                    {Object.keys(consolidatedItems).length === 0 && (
+                      <div style={{ gridColumn: 'span 2', color: '#666' }}>No hay productos para cargar.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="no-print" style={{ textAlign: 'center', padding: '50px', color: '#666' }}>
+                Por favor, selecciona una localidad en la parte superior para generar la hoja de ruta.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Local prints override */}
       <style jsx global>{`
         @media print {
           body { background: white !important; color: black !important; }
           .no-print { display: none !important; }
-          .print-only { display: inline !important; }
-          aside, header, footer, .whatsapp-btn { display: none !important; }
+          .print-only { display: block !important; }
+          aside, header, footer, .admin-orders-page > div:not(.manifest-modal) { display: none !important; }
           main { padding: 0 !important; }
+          
+          .manifest-modal { position: static !important; }
+          .manifest-content { 
+            position: static !important; 
+            transform: none !important; 
+            width: 100% !important; 
+            max-width: none !important; 
+            box-shadow: none !important;
+            padding: 0 !important;
+          }
         }
       `}</style>
     </div>
