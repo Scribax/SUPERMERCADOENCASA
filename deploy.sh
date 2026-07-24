@@ -72,6 +72,13 @@ server {
     listen 80;
     server_name 186.64.123.152; # Cambiar por tu dominio si tienes uno
 
+    # Servir imágenes locales directamente con Nginx
+    location /uploads/ {
+        alias /var/www/supermercadoencasa/public/uploads/;
+        access_log off;
+        expires max;
+    }
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -89,6 +96,12 @@ EOT
 # Activar sitio y reiniciar Nginx
 ln -sf /etc/nginx/sites-available/superencasa /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default || true
+
+# Crear carpeta de subidas y dar permisos adecuados antes de reiniciar Nginx
+mkdir -p /var/www/supermercadoencasa/public/uploads
+chmod -R 775 /var/www/supermercadoencasa/public/uploads || true
+chown -R www-data:www-data /var/www/supermercadoencasa/public/uploads || true
+
 nginx -t
 systemctl restart nginx
 
