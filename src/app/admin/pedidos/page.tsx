@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/Toast';
-import { Eye, ChevronUp, Printer, Phone, MapPin, X } from 'lucide-react';
+import { Eye, ChevronUp, Printer, Phone, MapPin, X, FileText } from 'lucide-react';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -67,6 +67,65 @@ export default function AdminOrders() {
     setFilteredOrders(result);
   }, [statusFilter, localityFilter, orders]);
 
+  // Export filtered orders to Excel (CSV)
+  const exportToCSV = () => {
+    if (!filteredOrders || filteredOrders.length === 0) {
+      toast.error('No hay pedidos para exportar');
+      return;
+    }
+
+    const headers = [
+      'ID Pedido',
+      'Fecha',
+      'Cliente',
+      'Email',
+      'Telefono',
+      'Localidad',
+      'Direccion de Envio',
+      'Metodo de Pago',
+      'Estado de Pago',
+      'Estado del Pedido',
+      'Subtotal',
+      'Costo Envio',
+      'Descuento',
+      'Total',
+      'Productos Comprados'
+    ];
+
+    const rows = filteredOrders.map((o) => {
+      const itemsList = o.items ? o.items.map((i: any) => `${i.name} (x${i.quantity})`).join(' | ') : '';
+      return [
+        `"#${o.id.slice(0, 8)}"`,
+        `"${new Date(o.createdAt).toLocaleString('es-AR')}"`,
+        `"${(o.customerName || '').replace(/"/g, '""')}"`,
+        `"${(o.customerEmail || '').replace(/"/g, '""')}"`,
+        `"${(o.customerPhone || '').replace(/"/g, '""')}"`,
+        `"${(o.locality || '').replace(/"/g, '""')}"`,
+        `"${(o.shippingAddress || '').replace(/"/g, '""')}"`,
+        `"${o.paymentMethod}"`,
+        `"${o.paymentStatus === 'PAID' ? 'Acreditado' : 'Pendiente'}"`,
+        `"${translateStatus(o.status)}"`,
+        o.subtotal.toFixed(2),
+        o.shippingCost.toFixed(2),
+        o.discount.toFixed(2),
+        o.total.toFixed(2),
+        `"${itemsList.replace(/"/g, '""')}"`
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    link.setAttribute('download', `planilla_pedidos_superencasa_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Planilla de pedidos descargada en formato Excel (CSV)');
+  };
+
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -113,11 +172,11 @@ export default function AdminOrders() {
     if (order.status === 'PREPARING') {
       msg = `Hola ${order.customerName}! Tu pedido #${order.id.slice(0, 8)} en Superencasa ya se encuentra en preparación. ¡Te avisaremos apenas sea despachado!`;
     } else if (order.status === 'SHIPPED') {
-      msg = `¡Hola ${order.customerName}! Tu pedido #${order.id.slice(0, 8)} de Superencasa ya está en camino a tu domicilio.`;
+      msg = `¡Hola ${order.customerName}! Tu pedido #${order.id.slice(0, 8)} de Superencasa ya está en camino a tu domicilio en ${order.shippingAddress}.`;
     } else if (order.status === 'DELIVERED') {
       msg = `¡Hola ${order.customerName}! Tu pedido #${order.id.slice(0, 8)} de Superencasa ya fue entregado. ¡Muchas gracias por tu compra!`;
     } else {
-      msg = `Hola ${order.customerName}! Nos comunicamos desde Superencasa por tu pedido #${order.id.slice(0, 8)}.`;
+      msg = `Hola ${order.customerName}! Nos comunicamos desde Superencasa por tu pedido #${order.id.slice(0, 8)} de $${order.total.toFixed(2)}.`;
     }
 
     const cleanPhone = order.customerPhone.replace(/[^0-9]/g, '');
@@ -162,25 +221,50 @@ export default function AdminOrders() {
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }} className="no-print">
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '800' }}>Gestión de Pedidos</h1>
-          <p style={{ color: 'var(--foreground-muted)' }}>Visualizá, prepará y actualizá los pedidos de tus clientes.</p>
+          <p style={{ color: 'var(--foreground-muted)' }}>Visualizá, prepará, exportá y actualizá los pedidos de tus clientes.</p>
         </div>
         
-        <button
-          onClick={() => setIsManifestOpen(true)}
-          style={{
-            backgroundColor: 'var(--primary)',
-            color: 'white',
-            padding: '10px 20px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '14px',
-            fontWeight: '700',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <Printer size={16} /> Hoja de Ruta por Localidad
-        </button>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            onClick={exportToCSV}
+            style={{
+              backgroundColor: '#107C41',
+              color: 'white',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '14px',
+              fontWeight: '700',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            <FileText size={16} /> Exportar Excel (CSV)
+          </button>
+
+          <button
+            onClick={() => setIsManifestOpen(true)}
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'white',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '14px',
+              fontWeight: '700',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            <Printer size={16} /> Hoja de Ruta por Localidad
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -480,7 +564,35 @@ export default function AdminOrders() {
                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>#{o.id.slice(0, 8)}</td>
                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.customerName}</td>
                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.shippingAddress}</td>
-                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.customerPhone}</td>
+                            <td style={{ padding: '8px', border: '1px solid #ddd' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                                <span>{o.customerPhone}</span>
+                                <button
+                                  className="no-print"
+                                  onClick={() => {
+                                    const cleanPhone = o.customerPhone.replace(/[^0-9]/g, '');
+                                    const msg = `¡Hola ${o.customerName}! Te contactamos del reparto de Superencasa. Estamos en camino a tu domicilio (${o.shippingAddress}) para entregarte el pedido #${o.id.slice(0, 8)}. Total a cobrar: $${o.total.toFixed(2)}.`;
+                                    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                                  }}
+                                  style={{
+                                    backgroundColor: '#25D366',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    padding: '3px 6px',
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                  }}
+                                  title="Avisar por WhatsApp al cliente"
+                                >
+                                  <Phone size={10} /> Avisar
+                                </button>
+                              </div>
+                            </td>
                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.paymentMethod}</td>
                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{o.paymentStatus === 'PAID' ? 'Acreditado' : 'Pendiente'}</td>
                             <td style={{ 
