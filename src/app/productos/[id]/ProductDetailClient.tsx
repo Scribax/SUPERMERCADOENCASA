@@ -21,7 +21,7 @@ interface ClientProps {
 }
 
 export default function ProductDetailClient({ product, relatedProducts, avgRating, reviewCount }: ClientProps) {
-  const { addToCart, toggleFavorite, isFavorite, addToHistory } = useCart();
+  const { addToCart, toggleFavorite, isFavorite, addToHistory, promotions } = useCart();
   const { user } = useAuth();
   const toast = useToast();
   const router = useRouter();
@@ -265,6 +265,52 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
                 </>
               )}
             </div>
+
+            {/* Active Automatic Promotion Banner */}
+            {(() => {
+              const activePromo = (promotions || []).find((promo: any) => {
+                try {
+                  const config = JSON.parse(promo.configJson || '{}');
+                  const matchesCategory = Boolean(config.categoryId && product.categoryId === config.categoryId);
+                  const matchesProduct = Boolean(config.productIds && config.productIds.includes(product.id));
+                  const appliesToAll = Boolean(config.appliesToAll === true);
+                  return promo.isActive && (matchesCategory || matchesProduct || appliesToAll);
+                } catch (e) {
+                  return false;
+                }
+              });
+
+              if (!activePromo) return null;
+
+              return (
+                <div
+                  style={{
+                    marginBottom: '24px',
+                    padding: '14px 18px',
+                    backgroundColor: '#e8f5e9',
+                    border: '1px solid #c8e6c9',
+                    borderRadius: 'var(--radius-md)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: '#2e7d32',
+                    boxShadow: '0 2px 8px rgba(46, 125, 50, 0.1)',
+                  }}
+                >
+                  <Sparkles size={22} style={{ flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontWeight: '800', fontSize: '15px' }}>
+                      ¡Promoción en Carrito: {activePromo.name}!
+                    </div>
+                    <div style={{ fontSize: '13px', marginTop: '2px', color: '#1b5e20' }}>
+                      {activePromo.type === 'AUTO_DISCOUNT' && `Se aplicará un ${activePromo.value}% de descuento automático al sumar este producto a tu compra.`}
+                      {activePromo.type === 'TWO_FOR_ONE' && `¡Llevá 2 unidades de esta categoría y pagá solo 1!`}
+                      {activePromo.type === 'THREE_FOR_TWO' && `¡Llevá 3 unidades de esta categoría y pagá solo 2!`}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Stock Levels */}
             <div style={{ marginBottom: '30px' }}>
