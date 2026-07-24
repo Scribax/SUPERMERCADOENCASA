@@ -15,6 +15,7 @@ export default function CartDrawer() {
     subtotal,
     promoDiscount,
     couponDiscount,
+    promotions,
     shippingCost,
     freeShippingThreshold,
     coupon,
@@ -59,14 +60,14 @@ export default function CartDrawer() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(4px)',
-          zIndex: 9998,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(3px)',
+          zIndex: 1001,
           animation: 'fade-in 0.2s ease',
         }}
       />
 
-      {/* Drawer */}
+      {/* Slide-over Drawer */}
       <div
         style={{
           position: 'fixed',
@@ -74,13 +75,13 @@ export default function CartDrawer() {
           right: 0,
           bottom: 0,
           width: '100%',
-          maxWidth: '460px',
+          maxWidth: '440px',
           backgroundColor: 'var(--card-bg)',
-          boxShadow: 'var(--shadow-xl)',
-          zIndex: 9999,
+          zIndex: 1002,
           display: 'flex',
           flexDirection: 'column',
-          animation: 'slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          boxShadow: 'var(--shadow-xl)',
+          animation: 'slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {/* Header */}
@@ -190,10 +191,36 @@ export default function CartDrawer() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {cart.map((item) => {
-                const price =
+                const itemPrice =
                   item.product.offerPrice !== null && item.product.offerPrice !== undefined
                     ? item.product.offerPrice
                     : item.product.price;
+
+                let itemPromoDisc = 0;
+                promotions.forEach((promo) => {
+                  try {
+                    const config = JSON.parse(promo.configJson || '{}');
+                    const matchesCategory = Boolean(config.categoryId && item.product.categoryId === config.categoryId);
+                    const matchesProduct = Boolean(config.productIds && config.productIds.includes(item.product.id));
+                    const appliesToAll = Boolean(config.appliesToAll === true);
+
+                    if (matchesCategory || matchesProduct || appliesToAll) {
+                      if (promo.type === 'TWO_FOR_ONE') {
+                        const pairs = Math.floor(item.quantity / 2);
+                        itemPromoDisc += pairs * itemPrice;
+                      } else if (promo.type === 'THREE_FOR_TWO') {
+                        const triplets = Math.floor(item.quantity / 3);
+                        itemPromoDisc += triplets * itemPrice;
+                      } else if (promo.type === 'AUTO_DISCOUNT') {
+                        itemPromoDisc += (itemPrice * item.quantity) * (promo.value / 100);
+                      }
+                    }
+                  } catch (e) {}
+                });
+                itemPromoDisc = Math.min(itemPromoDisc, itemPrice * item.quantity);
+                const finalUnitPrice = (itemPrice * item.quantity - itemPromoDisc) / item.quantity;
+                const promoPct = Math.round((itemPromoDisc / (itemPrice * item.quantity)) * 100);
+
                 return (
                   <div
                     key={item.product.id}
@@ -219,9 +246,26 @@ export default function CartDrawer() {
                       <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', lineBreak: 'anywhere' }}>
                         {item.product.name}
                       </h4>
-                      <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--primary)', marginBottom: '8px' }}>
-                        ${price.toFixed(2)}
-                      </p>
+                      
+                      <div style={{ marginBottom: '8px' }}>
+                        {itemPromoDisc > 0 ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '15px', fontWeight: '800', color: 'var(--success)' }}>
+                              ${finalUnitPrice.toFixed(2)}
+                            </span>
+                            <span style={{ fontSize: '12px', textDecoration: 'line-through', color: 'var(--foreground-muted)' }}>
+                              ${itemPrice.toFixed(2)}
+                            </span>
+                            <span style={{ fontSize: '10px', fontWeight: '700', backgroundColor: '#e8f5e9', color: '#2e7d32', padding: '2px 6px', borderRadius: '4px' }}>
+                              Promo -{promoPct}%
+                            </span>
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--primary)' }}>
+                            ${itemPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         {/* Quantity controls */}
                         <div
