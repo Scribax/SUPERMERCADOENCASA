@@ -17,44 +17,44 @@ export default function ProductCard({
   price, 
   originalPrice, 
   discount,
-  imagePlaceholderColor = "bg-slate-100"
+  imagePlaceholderColor = "#F1F5F9"
 }: ProductCardProps) {
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-xl transition-shadow flex flex-col h-full relative group"
+      style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #F1F5F9', padding: '16px', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', cursor: 'pointer' }}
     >
       {/* Discount Badge */}
       {discount && (
-        <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10 shadow-sm">
+        <div style={{ position: 'absolute', top: '12px', left: '12px', backgroundColor: '#F97316', color: '#FFFFFF', fontSize: '12px', fontWeight: '700', padding: '4px 8px', borderRadius: '6px', zIndex: 10, boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
           {discount} OFF
         </div>
       )}
 
       {/* Product Image Placeholder */}
-      <div className={`w-full aspect-square rounded-xl ${imagePlaceholderColor} mb-4 overflow-hidden relative`}>
+      <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '12px', backgroundColor: imagePlaceholderColor, marginBottom: '16px', overflow: 'hidden', position: 'relative' }}>
         <motion.div 
-          className="w-full h-full"
+          style={{ width: '100%', height: '100%' }}
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
         />
       </div>
 
       {/* Product Info */}
-      <div className="flex-1 flex flex-col">
-        <h3 className="font-semibold text-slate-800 leading-tight mb-1 line-clamp-2">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <h3 style={{ fontWeight: '600', color: '#1E293B', lineHeight: 1.25, marginBottom: '4px', fontSize: '16px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {title}
         </h3>
-        <p className="text-xs text-slate-500 mb-3">{presentation}</p>
+        <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '12px', margin: 0 }}>{presentation}</p>
         
-        <div className="mt-auto">
+        <div style={{ marginTop: 'auto' }}>
           {originalPrice && (
-            <p className="text-sm text-slate-400 line-through mb-0.5">
+            <p style={{ fontSize: '14px', color: '#94A3B8', textDecoration: 'line-through', marginBottom: '2px', margin: 0 }}>
               ${originalPrice.toFixed(2)}
             </p>
           )}
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-2xl font-bold text-[#0E4FAF]">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
+            <p style={{ fontSize: '24px', fontWeight: '700', color: '#0E4FAF', margin: 0 }}>
               ${price.toFixed(2)}
             </p>
           </div>
@@ -62,7 +62,7 @@ export default function ProductCard({
       </div>
 
       {/* Add to Cart Button */}
-      <button className="w-full mt-4 bg-slate-50 hover:bg-[#0E4FAF] text-[#0E4FAF] hover:text-white border border-slate-200 hover:border-[#0E4FAF] rounded-lg py-2.5 font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300">
+      <button style={{ width: '100%', marginTop: '16px', backgroundColor: '#F8FAFC', color: '#0E4FAF', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '10px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.3s' }}>
         <ShoppingCart size={16} />
         Agregar
       </button>

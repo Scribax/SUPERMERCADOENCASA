@@ -3,77 +3,72 @@ import { ShoppingCart, Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0E4FAF] text-white pt-16 pb-8 border-t-[8px] border-[#74C33D]">
-      <div className="max-w-7xl mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Section 1 */}
+    <footer style={{ backgroundColor: '#0E4FAF', color: '#FFFFFF', paddingTop: '64px', paddingBottom: '32px', borderTop: '8px solid #74C33D' }}>
+      <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '48px' }}>
           <div>
-            <div className="flex items-center gap-2 mb-6">
-              <ShoppingCart size={32} className="text-[#74C33D]" />
-              <span className="text-2xl font-bold text-white tracking-tight">
-                Super<span className="text-[#74C33D]">encasa</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+              <ShoppingCart size={32} color="#74C33D" />
+              <span style={{ fontSize: '24px', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+                Super<span style={{ color: '#74C33D' }}>encasa</span>
               </span>
             </div>
-            <p className="text-blue-100 text-sm mb-6 leading-relaxed">
+            <p style={{ color: '#DBEAFE', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
               Tu supermercado 100% online. Hacé tus compras de todos los días de la forma más rápida, fácil y segura.
             </p>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center gap-3 text-blue-100">
-                <Phone size={18} className="text-[#74C33D]" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#DBEAFE' }}>
+                <Phone size={18} color="#74C33D" />
                 <span>+54 9 11 1234-5678</span>
               </div>
-              <div className="flex items-center gap-3 text-blue-100">
-                <Mail size={18} className="text-[#74C33D]" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#DBEAFE' }}>
+                <Mail size={18} color="#74C33D" />
                 <span>hola@superencasa.com.ar</span>
               </div>
             </div>
           </div>
 
-          {/* Section 2 */}
           <div>
-            <h4 className="font-bold text-lg mb-6 text-white">Navegación</h4>
-            <ul className="space-y-3 text-sm text-blue-100">
-              <li><a href="#" className="hover:text-white transition-colors">Inicio</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Todas las Ofertas</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Rubros</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Cómo Comprar</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Revendedores</a></li>
+            <h4 style={{ fontWeight: '700', fontSize: '18px', marginBottom: '24px', color: '#FFFFFF' }}>Navegación</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#DBEAFE' }}>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Inicio</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Todas las Ofertas</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Rubros</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Cómo Comprar</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Revendedores</a></li>
             </ul>
           </div>
 
-          {/* Section 2 (extra) */}
           <div>
-            <h4 className="font-bold text-lg mb-6 text-white">Atención al Cliente</h4>
-            <ul className="space-y-3 text-sm text-blue-100">
-              <li><a href="#" className="hover:text-white transition-colors">Preguntas Frecuentes</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Políticas de Envío</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Términos y Condiciones</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Botón de Arrepentimiento</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Defensa al Consumidor</a></li>
+            <h4 style={{ fontWeight: '700', fontSize: '18px', marginBottom: '24px', color: '#FFFFFF' }}>Atención al Cliente</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#DBEAFE' }}>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Preguntas Frecuentes</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Políticas de Envío</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Términos y Condiciones</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Botón de Arrepentimiento</a></li>
+              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Defensa al Consumidor</a></li>
             </ul>
           </div>
 
-          {/* Section 3: Cities */}
           <div>
-            <h4 className="font-bold text-lg mb-6 text-white">Zonas de Cobertura</h4>
-            <div className="flex flex-col gap-3 text-sm text-blue-100 bg-[#1662C9] p-5 rounded-xl border border-blue-400/30">
-              <div className="flex items-center gap-2"><MapPin size={16} className="text-[#74C33D] shrink-0" /> <span>Pigué</span></div>
-              <div className="flex items-center gap-2"><MapPin size={16} className="text-[#74C33D] shrink-0" /> <span>Bahía Blanca</span></div>
-              <div className="flex items-center gap-2"><MapPin size={16} className="text-[#74C33D] shrink-0" /> <span>Patagones</span></div>
-              <div className="flex items-center gap-2"><MapPin size={16} className="text-[#74C33D] shrink-0" /> <span>Viedma</span></div>
-              <div className="mt-2 pt-3 border-t border-blue-400/30 font-medium text-white">
+            <h4 style={{ fontWeight: '700', fontSize: '18px', marginBottom: '24px', color: '#FFFFFF' }}>Zonas de Cobertura</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#DBEAFE', backgroundColor: '#1662C9', padding: '20px', borderRadius: '12px', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Pigué</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Bahía Blanca</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Patagones</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Viedma</span></div>
+              <div style={{ marginTop: '8px', paddingTop: '12px', borderTop: '1px solid rgba(96, 165, 250, 0.3)', fontWeight: '500', color: '#FFFFFF' }}>
                 Próximamente más ciudades 🚀
               </div>
             </div>
           </div>
         </div>
 
-        {/* Section 4: Copyright */}
-        <div className="pt-8 border-t border-blue-800 text-sm text-blue-200 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-          <p>© {new Date().getFullYear()} Superencasa. Todos los derechos reservados.</p>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-white transition-colors">Privacidad</a>
-            <a href="#" className="hover:text-white transition-colors">Términos</a>
+        <div style={{ paddingTop: '32px', borderTop: '1px solid #1E40AF', fontSize: '14px', color: '#BFDBFE', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+          <p style={{ margin: 0 }}>© {new Date().getFullYear()} Superencasa. Todos los derechos reservados.</p>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidad</a>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Términos</a>
           </div>
         </div>
       </div>

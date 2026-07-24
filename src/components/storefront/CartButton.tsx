@@ -7,13 +7,13 @@ export default function CartButton() {
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="relative flex items-center justify-center p-2 text-slate-700 hover:text-[#0E4FAF] transition-colors"
+      style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px', color: '#334155', cursor: 'pointer', background: 'transparent', border: 'none' }}
     >
       <ShoppingBag size={24} />
-      <span className="absolute -top-1 -right-1 bg-[#74C33D] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+      <span style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: '#74C33D', color: '#FFFFFF', fontSize: '10px', fontWeight: '700', padding: '2px 6px', borderRadius: '9999px' }}>
         3
       </span>
-      <span className="ml-2 hidden md:inline font-medium">Mi carrito</span>
+      <span style={{ marginLeft: '8px', fontWeight: '500' }}>Mi carrito</span>
     </motion.button>
   );
 }

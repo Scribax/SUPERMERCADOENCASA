@@ -26,15 +26,15 @@ const BENEFITS = [
 
 export default function Benefits() {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-12">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <section style={{ width: '100%', maxWidth: '1240px', margin: '0 auto', padding: '48px 16px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
         {BENEFITS.map((item, i) => (
-          <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col items-center text-center">
-            <div className="w-14 h-14 bg-[#F4F9F1] rounded-full flex items-center justify-center mb-4">
-              <item.icon size={28} className="text-[#74C33D]" />
+          <div key={i} style={{ flex: '1 1 250px', backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', border: '1px solid #F1F5F9', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ width: '56px', height: '56px', backgroundColor: '#F4F9F1', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <item.icon size={28} color="#74C33D" />
             </div>
-            <h4 className="font-bold text-slate-800 text-lg mb-1">{item.title}</h4>
-            <p className="text-slate-500 text-sm">{item.description}</p>
+            <h4 style={{ fontWeight: '700', color: '#1E293B', fontSize: '18px', marginBottom: '4px' }}>{item.title}</h4>
+            <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>{item.description}</p>
           </div>
         ))}
       </div>

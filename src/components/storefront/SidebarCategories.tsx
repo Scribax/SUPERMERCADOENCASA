@@ -24,39 +24,39 @@ const CATEGORIES = [
 
 export default function SidebarCategories() {
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col h-full border border-slate-100">
-      <div className="bg-[#0E4FAF] px-4 py-3 flex items-center gap-2 text-white font-bold">
-        <span className="text-xl">≡</span>
+    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid #F1F5F9' }}>
+      <div style={{ backgroundColor: '#0E4FAF', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', color: '#FFFFFF', fontWeight: '700' }}>
+        <span style={{ fontSize: '20px' }}>≡</span>
         <span>Todos los rubros</span>
       </div>
       
-      <div className="flex-1 overflow-y-auto py-2">
-        <ul className="flex flex-col">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+        <ul style={{ display: 'flex', flexDirection: 'column', listStyle: 'none', margin: 0, padding: 0 }}>
           {CATEGORIES.map((cat, i) => (
             <motion.li
               key={i}
               whileHover={{ x: 4, backgroundColor: '#F1F5F9' }}
-              className="px-4 py-2 cursor-pointer flex items-center justify-between text-slate-700 transition-colors"
+              style={{ padding: '8px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#334155' }}
             >
-              <div className="flex items-center gap-3">
-                <cat.icon size={18} className="text-slate-400" />
-                <span className="text-sm font-medium">{cat.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <cat.icon size={18} color="#94A3B8" />
+                <span style={{ fontSize: '14px', fontWeight: '500' }}>{cat.name}</span>
               </div>
-              <ChevronRight size={16} className="text-slate-300" />
+              <ChevronRight size={16} color="#CBD5E1" />
             </motion.li>
           ))}
         </ul>
       </div>
 
-      <div className="p-4 border-t border-slate-100 bg-slate-50">
-        <div className="bg-[#EBF5FF] rounded-xl p-4 border border-blue-100">
-          <h4 className="text-sm font-bold text-[#0E4FAF] mb-1 leading-tight">
+      <div style={{ padding: '16px', borderTop: '1px solid #F1F5F9', backgroundColor: '#F8FAFC' }}>
+        <div style={{ backgroundColor: '#EBF5FF', borderRadius: '12px', padding: '16px', border: '1px solid #DBEAFE' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#0E4FAF', marginBottom: '4px', lineHeight: 1.25, margin: 0 }}>
             ¿Sos revendedor o recomendador?
           </h4>
-          <p className="text-xs text-slate-600 mb-3">
+          <p style={{ fontSize: '12px', color: '#475569', marginBottom: '12px', margin: 0, marginTop: '4px' }}>
             Sumate a nuestra red y empezá a ganar
           </p>
-          <button className="w-full bg-[#0E4FAF] hover:bg-[#1662C9] text-white text-xs font-semibold py-2 rounded-md transition-colors">
+          <button style={{ width: '100%', backgroundColor: '#0E4FAF', color: '#FFFFFF', fontSize: '12px', fontWeight: '600', padding: '8px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>
             Más información
           </button>
         </div>

@@ -6,15 +6,15 @@ export default function SearchBar() {
   const [query, setQuery] = useState('');
 
   return (
-    <div className="flex w-full max-w-lg relative group">
+    <div style={{ display: 'flex', width: '100%', maxWidth: '500px', position: 'relative' }}>
       <input
         type="text"
         placeholder="Buscar productos, marcas y más..."
-        className="w-full border border-slate-300 rounded-l-md px-4 py-2 outline-none focus:border-[#0E4FAF] focus:ring-1 focus:ring-[#0E4FAF]"
+        style={{ width: '100%', border: '1px solid #CBD5E1', borderRight: 'none', borderRadius: '6px 0 0 6px', padding: '8px 16px', outline: 'none', fontSize: '14px', color: '#334155' }}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <button className="bg-[#0E4FAF] text-white px-4 rounded-r-md flex items-center justify-center hover:bg-[#1662C9] transition-colors">
+      <button style={{ backgroundColor: '#0E4FAF', color: '#FFFFFF', padding: '0 16px', borderRadius: '0 6px 6px 0', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
         <Search size={20} />
       </button>
     </div>

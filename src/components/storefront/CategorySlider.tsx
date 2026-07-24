@@ -19,18 +19,18 @@ const CATEGORIES = [
 
 export default function CategorySlider() {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-8">
-      <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 scrollbar-hide snap-x">
+    <section style={{ width: '100%', maxWidth: '1240px', margin: '0 auto', padding: '32px 16px' }}>
+      <div style={{ display: 'flex', overflowX: 'auto', gap: '24px', paddingBottom: '16px' }}>
         {CATEGORIES.map((cat, i) => (
           <motion.div
             key={i}
             whileHover={{ y: -6, scale: 1.05 }}
-            className="flex flex-col items-center gap-3 min-w-[100px] cursor-pointer snap-start group"
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', minWidth: '100px', cursor: 'pointer' }}
           >
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-[#0E4FAF] group-hover:shadow-md group-hover:border-blue-100 transition-all duration-300">
+            <div style={{ width: '96px', height: '96px', borderRadius: '50%', backgroundColor: '#FFFFFF', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', border: '1px solid #F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0E4FAF' }}>
               <cat.icon size={32} strokeWidth={1.5} />
             </div>
-            <span className="text-sm font-medium text-slate-700 text-center leading-tight">
+            <span style={{ fontSize: '14px', fontWeight: '500', color: '#334155', textAlign: 'center', lineHeight: 1.25 }}>
               {cat.name}
             </span>
           </motion.div>

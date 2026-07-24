@@ -9,9 +9,9 @@ export default function WhatsAppButton() {
       rel="noopener noreferrer"
       whileHover={{ scale: 1.02, backgroundColor: '#62A933' }}
       whileTap={{ scale: 0.98 }}
-      className="bg-[#74C33D] text-white px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 shadow-sm"
+      style={{ backgroundColor: '#74C33D', color: '#FFFFFF', padding: '8px 16px', borderRadius: '6px', fontWeight: '500', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', textDecoration: 'none' }}
     >
-      <span className="text-lg">🟢</span>
+      <span style={{ fontSize: '18px' }}>🟢</span>
       ¿Necesitás ayuda? Escribinos por WhatsApp
     </motion.a>
   );

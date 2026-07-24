@@ -1,5 +1,5 @@
-import Header from '@/components/storefront/Header';
 import TopBenefits from '@/components/storefront/TopBenefits';
+import Header from '@/components/storefront/Header';
 import Hero from '@/components/storefront/Hero';
 import CategorySlider from '@/components/storefront/CategorySlider';
 import FeaturedProducts from '@/components/storefront/FeaturedProducts';
@@ -8,25 +8,21 @@ import Footer from '@/components/storefront/Footer';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
+    <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <TopBenefits />
       <Header />
-      
-      <main className="flex-1 w-full flex flex-col">
-        <div className="w-full bg-[#E2E8F0] pt-4 pb-12">
+      <main style={{ flex: 1, width: '100%' }}>
+        <div style={{ backgroundColor: '#E8EDF3', paddingTop: '16px', paddingBottom: '48px' }}>
           <Hero />
           <CategorySlider />
         </div>
-        
-        <div className="w-full bg-[#F8FAFC]">
+        <div style={{ backgroundColor: '#F8FAFC' }}>
           <FeaturedProducts />
         </div>
-        
-        <div className="w-full bg-white border-t border-slate-100">
+        <div style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #F1F5F9' }}>
           <Benefits />
         </div>
       </main>
-
       <Footer />
     </div>
   );
