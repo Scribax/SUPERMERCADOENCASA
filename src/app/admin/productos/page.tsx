@@ -499,7 +499,6 @@ export default function AdminProducts() {
                     placeholder="https://ejemplo.com/imagen.jpg"
                     value={form.images}
                     onChange={(e) => setForm({ ...form, images: e.target.value })}
-                    required
                     style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
                   />
                   <label
@@ -527,6 +526,54 @@ export default function AdminProducts() {
                     />
                   </label>
                 </div>
+                
+                {/* Images Preview Gallery */}
+                {form.images && form.images.split(',').filter(x => x.trim()).length > 0 && (
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+                    {form.images.split(',').map((imgUrl, idx) => {
+                      const trimmed = imgUrl.trim();
+                      if (!trimmed) return null;
+                      return (
+                        <div key={idx} style={{ position: 'relative', width: '60px', height: '60px' }}>
+                          <img
+                            src={trimmed}
+                            alt="Vista previa"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const parts = form.images.split(',').map(x => x.trim()).filter(x => x);
+                              parts.splice(idx, 1);
+                              setForm({ ...form, images: parts.join(', ') });
+                            }}
+                            style={{
+                              position: 'absolute',
+                              top: '-6px',
+                              right: '-6px',
+                              backgroundColor: 'var(--error)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '18px',
+                              height: '18px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '10px',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              boxShadow: 'var(--shadow-sm)',
+                            }}
+                            title="Eliminar imagen"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div>

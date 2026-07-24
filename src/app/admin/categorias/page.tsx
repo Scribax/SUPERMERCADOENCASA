@@ -307,6 +307,42 @@ export default function AdminCategories() {
                       />
                     </label>
                   </div>
+                  
+                  {/* Single Image Preview */}
+                  {form.image && (
+                    <div style={{ position: 'relative', width: '60px', height: '60px', marginTop: '10px' }}>
+                      <img
+                        src={form.image}
+                        alt="Vista previa"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, image: '' })}
+                        style={{
+                          position: 'absolute',
+                          top: '-6px',
+                          right: '-6px',
+                          backgroundColor: 'var(--error)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '18px',
+                          height: '18px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          boxShadow: 'var(--shadow-sm)',
+                        }}
+                        title="Eliminar imagen"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Orden</label>
