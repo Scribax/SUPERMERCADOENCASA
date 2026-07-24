@@ -4,14 +4,18 @@ import SidebarCategories from './SidebarCategories';
 import HeroAffiliateCard from './HeroAffiliateCard';
 import Image from 'next/image';
 
-export default function Hero() {
+interface HeroProps {
+  categories: { id: string; name: string; slug: string; icon: string | null }[];
+}
+
+export default function Hero({ categories }: HeroProps) {
   return (
     <section style={{ maxWidth: '1240px', margin: '0 auto', padding: '24px 16px', width: '100%' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', minHeight: '440px' }}>
         {/* Left Column: Sidebar Categories */}
         <div style={{ flex: '1 1 260px', maxWidth: '280px', display: 'flex' }}>
           <div style={{ width: '100%', display: 'block' }}>
-            <SidebarCategories />
+            <SidebarCategories categories={categories} />
           </div>
         </div>
 

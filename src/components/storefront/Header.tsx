@@ -3,8 +3,12 @@ import LocationSelector from './LocationSelector';
 import SearchBar from './SearchBar';
 import CartButton from './CartButton';
 import { ShoppingCart } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import Link from 'next/link';
 
 export default function Header() {
+  const { user } = useAuth();
+
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', width: '100%' }}>
       <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', width: '100%', flexWrap: 'wrap' }}>
@@ -35,10 +39,12 @@ export default function Header() {
         {/* Right Section: Account and Cart */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', fontSize: '13px' }}>
-            <span style={{ color: '#64748B', fontSize: '12px' }}>Bienvenido</span>
-            <a href="/cuenta" style={{ color: '#0E4FAF', fontWeight: '700', textDecoration: 'none' }}>
-              Ingresar / Mi cuenta
-            </a>
+            <span style={{ color: '#64748B', fontSize: '12px' }}>
+              {user ? `Hola, ${user.name}` : 'Bienvenido'}
+            </span>
+            <Link href={user ? "/cuenta" : "/login"} style={{ color: '#0E4FAF', fontWeight: '700', textDecoration: 'none' }}>
+              {user ? 'Mi cuenta' : 'Ingresar / Mi cuenta'}
+            </Link>
           </div>
           <CartButton />
         </div>
