@@ -9,10 +9,10 @@ export default function WhatsAppButton() {
       rel="noopener noreferrer"
       whileHover={{ scale: 1.02, backgroundColor: '#62A933' }}
       whileTap={{ scale: 0.98 }}
-      style={{ backgroundColor: '#74C33D', color: '#FFFFFF', padding: '8px 16px', borderRadius: '6px', fontWeight: '500', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', textDecoration: 'none' }}
+      style={{ backgroundColor: '#74C33D', color: '#FFFFFF', padding: '5px 12px', borderRadius: '6px', fontWeight: '600', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', whiteSpace: 'nowrap', border: 'none' }}
     >
-      <span style={{ fontSize: '18px' }}>🟢</span>
-      ¿Necesitás ayuda? Escribinos por WhatsApp
+      <span style={{ fontSize: '14px' }}>💬</span>
+      Escribinos por WhatsApp
     </motion.a>
   );
 }
