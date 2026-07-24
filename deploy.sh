@@ -47,11 +47,14 @@ NODE_ENV=production
 EOT
 fi
 
+echo "Generando cliente de Prisma..."
+npx prisma generate
+
 echo "Ejecutando migraciones de base de datos..."
 npx prisma migrate deploy
 
 echo "Sembrando datos iniciales en la base de datos..."
-npx /usr/bin/env npx prisma db seed || echo "La base de datos ya contiene datos o el comando seed falló."
+npx prisma db seed || echo "La base de datos ya contiene datos o el comando seed falló."
 
 echo "Construyendo la aplicación Next.js..."
 npm run build
