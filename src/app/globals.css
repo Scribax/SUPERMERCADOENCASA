@@ -3,55 +3,55 @@
 /* GLOBAL CSS VARIABLES & THEMES */
 :root {
   /* Fonts */
-  --font-primary: 'Outfit', sans-serif;
-  --font-secondary: 'Inter', sans-serif;
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-secondary: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* Colors */
-  --primary: #1976D2;
-  --primary-hover: #1565C0;
-  --primary-light: rgba(25, 118, 210, 0.1);
-  --success: #7CB518;
-  --success-hover: #699b13;
-  --success-light: rgba(124, 181, 24, 0.1);
-  --accent: #F57C00;
-  --accent-hover: #E65100;
-  --accent-light: rgba(245, 124, 0, 0.1);
+  --primary: #0E4FAF;
+  --primary-hover: #0B4193;
+  --primary-light: rgba(14, 79, 175, 0.08);
+  --success: #74C33D;
+  --success-hover: #63AA32;
+  --success-light: rgba(116, 195, 61, 0.12);
+  --accent: #FF7043;
+  --accent-hover: #F4511E;
+  --accent-light: rgba(255, 112, 67, 0.12);
   
   --background: #FFFFFF;
-  --background-alt: #F8F9FA;
+  --background-alt: #F8FAFC;
   --card-bg: #FFFFFF;
-  --foreground: #212121;
-  --foreground-muted: #666666;
-  --border: #E0E0E0;
-  --border-light: #F0F0F0;
+  --foreground: #0F172A;
+  --foreground-muted: #64748B;
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
   --input-bg: #FFFFFF;
 
   /* Status Colors */
-  --error: #D32F2F;
-  --error-light: rgba(211, 47, 47, 0.1);
-  --warning: #FFA000;
-  --info: #0288D1;
+  --error: #EF4444;
+  --error-light: rgba(239, 68, 68, 0.1);
+  --warning: #F59E0B;
+  --info: #0E4FAF;
 
   /* Border Radius */
-  --radius-xs: 4px;
+  --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-xl: 0 16px 36px rgba(15, 23, 42, 0.12);
 
   /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Layout */
-  --header-height: 80px;
+  --header-height: 84px;
   --max-width: 1280px;
 }
 
