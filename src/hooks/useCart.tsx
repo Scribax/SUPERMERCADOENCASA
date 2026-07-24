@@ -263,34 +263,45 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, 0);
 
   // 2. Automatic Promotions (client-side calculation for visual representation)
-  const promoDiscount = cart.reduce((sum, item) => {
+  const rawPromoDiscount = cart.reduce((sum, item) => {
     const product = item.product;
     const price = product.offerPrice !== null && product.offerPrice !== undefined
       ? product.offerPrice
       : product.price;
 
+    const itemSubtotal = price * item.quantity;
     let itemDiscount = 0;
-    promotions.forEach((promo) => {
-      const config = JSON.parse(promo.configJson);
-      
-      const matchesCategory = config.categoryId && product.categoryId === config.categoryId;
-      const matchesProduct = config.productIds && config.productIds.includes(product.id);
-      const appliesToAll = !config.categoryId && (!config.productIds || config.productIds.length === 0);
 
-      if (matchesCategory || matchesProduct || appliesToAll) {
-        if (promo.type === 'TWO_FOR_ONE') {
-          const pairs = Math.floor(item.quantity / 2);
-          itemDiscount += pairs * price;
-        } else if (promo.type === 'THREE_FOR_TWO') {
-          const triplets = Math.floor(item.quantity / 3);
-          itemDiscount += triplets * price;
-        } else if (promo.type === 'AUTO_DISCOUNT') {
-          itemDiscount += (price * item.quantity) * (promo.value / 100);
+    promotions.forEach((promo) => {
+      try {
+        const config = JSON.parse(promo.configJson || '{}');
+        
+        const matchesCategory = Boolean(config.categoryId && product.categoryId === config.categoryId);
+        const matchesProduct = Boolean(config.productIds && config.productIds.includes(product.id));
+        const appliesToAll = Boolean(config.appliesToAll === true);
+
+        if (matchesCategory || matchesProduct || appliesToAll) {
+          if (promo.type === 'TWO_FOR_ONE') {
+            const pairs = Math.floor(item.quantity / 2);
+            itemDiscount += pairs * price;
+          } else if (promo.type === 'THREE_FOR_TWO') {
+            const triplets = Math.floor(item.quantity / 3);
+            itemDiscount += triplets * price;
+          } else if (promo.type === 'AUTO_DISCOUNT') {
+            itemDiscount += itemSubtotal * (promo.value / 100);
+          }
         }
+      } catch (e) {
+        console.error('Error parsing promo config:', e);
       }
     });
-    return sum + itemDiscount;
+
+    // Item discount can never exceed the item's own total price
+    return sum + Math.min(itemDiscount, itemSubtotal);
   }, 0);
+
+  // Total promo discount can never exceed cart subtotal
+  const promoDiscount = Math.min(rawPromoDiscount, subtotal);
 
   // 3. Coupon Discount calculation
   let couponDiscount = 0;

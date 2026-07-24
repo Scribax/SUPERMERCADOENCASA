@@ -112,27 +112,31 @@ export async function POST(request: NextRequest) {
       // Apply automatic promos
       let itemDiscount = 0;
       for (const promo of activePromos) {
-        const config = JSON.parse(promo.configJson);
-        
-        // Check if promo applies to this category or product
-        const matchesCategory = config.categoryId && product.categoryId === config.categoryId;
-        const matchesProduct = config.productIds && config.productIds.includes(product.id);
-        const appliesToAll = !config.categoryId && (!config.productIds || config.productIds.length === 0);
+        try {
+          const config = JSON.parse(promo.configJson || '{}');
+          
+          // Check if promo applies to this category or product
+          const matchesCategory = Boolean(config.categoryId && product.categoryId === config.categoryId);
+          const matchesProduct = Boolean(config.productIds && config.productIds.includes(product.id));
+          const appliesToAll = Boolean(config.appliesToAll === true);
 
-        if (matchesCategory || matchesProduct || appliesToAll) {
-          if (promo.type === 'TWO_FOR_ONE') {
-            const pairs = Math.floor(item.quantity / 2);
-            itemDiscount += pairs * itemPrice;
-          } else if (promo.type === 'THREE_FOR_TWO') {
-            const triplets = Math.floor(item.quantity / 3);
-            itemDiscount += triplets * itemPrice;
-          } else if (promo.type === 'AUTO_DISCOUNT') {
-            itemDiscount += itemSubtotal * (promo.value / 100);
+          if (matchesCategory || matchesProduct || appliesToAll) {
+            if (promo.type === 'TWO_FOR_ONE') {
+              const pairs = Math.floor(item.quantity / 2);
+              itemDiscount += pairs * itemPrice;
+            } else if (promo.type === 'THREE_FOR_TWO') {
+              const triplets = Math.floor(item.quantity / 3);
+              itemDiscount += triplets * itemPrice;
+            } else if (promo.type === 'AUTO_DISCOUNT') {
+              itemDiscount += itemSubtotal * (promo.value / 100);
+            }
           }
+        } catch (e) {
+          console.error('Error parsing promo config:', e);
         }
       }
 
-      promoDiscount += itemDiscount;
+      promoDiscount += Math.min(itemDiscount, itemSubtotal);
       orderItemsData.push({
         productId: product.id,
         name: product.name,
@@ -141,6 +145,9 @@ export async function POST(request: NextRequest) {
         stockDiff: -item.quantity, // Save diff for inventory updates
       });
     }
+
+    // Total promo discount can never exceed total subtotal
+    promoDiscount = Math.min(promoDiscount, subtotal);
 
     // 4. Calculate coupon discount
     let couponDiscount = 0;
