@@ -99,7 +99,14 @@ rm -f /etc/nginx/sites-enabled/default || true
 
 # Crear carpeta de subidas y dar permisos adecuados antes de reiniciar Nginx
 mkdir -p /var/www/supermercadoencasa/public/uploads
-chmod -R 775 /var/www/supermercadoencasa/public/uploads || true
+
+# Dar permisos de ejecución (+x) a las carpetas intermedias para que Nginx (www-data) pueda acceder
+chmod +x /var/www
+chmod +x /var/www/supermercadoencasa
+chmod +x /var/www/supermercadoencasa/public
+
+# Permisos de lectura/escritura en la carpeta de subidas
+chmod -R 755 /var/www/supermercadoencasa/public/uploads || true
 chown -R www-data:www-data /var/www/supermercadoencasa/public/uploads || true
 
 nginx -t
