@@ -75,7 +75,21 @@ export default function HeroSlider({ banners }: HeroSliderProps) {
               zIndex: isActive ? 2 : 1,
             }}
           >
-            <div className="container" style={{ padding: '0 40px' }}>
+            {/* Clickable full slide overlay */}
+            <Link
+              href={banner.linkUrl || '/productos'}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 1,
+              }}
+              aria-label={banner.title || 'Ver promociones'}
+            />
+
+            <div className="container" style={{ padding: '0 40px', position: 'relative', zIndex: 2, pointerEvents: 'none' }}>
               <div
                 style={{
                   maxWidth: '650px',
@@ -85,6 +99,7 @@ export default function HeroSlider({ banners }: HeroSliderProps) {
                   transform: isActive ? 'translateY(0)' : 'translateY(20px)',
                   opacity: isActive ? 1 : 0,
                   transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s',
+                  pointerEvents: 'auto',
                 }}
               >
                 {banner.title && (

@@ -423,6 +423,7 @@ export default function Navbar() {
             {user ? (
               <>
                 <button
+                  onClick={() => setProfileDropdownOpen((prev) => !prev)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -430,10 +431,15 @@ export default function Navbar() {
                     fontWeight: '600',
                     fontSize: '14px',
                     padding: '8px 0',
+                    cursor: 'pointer',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--foreground)',
                   }}
                 >
                   <User size={20} style={{ color: 'var(--primary)' }} />
                   <span className="profile-name">{user.name.split(' ')[0]}</span>
+                  <ChevronDown size={14} style={{ color: 'var(--foreground-muted)', transform: profileDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
                 </button>
 
                 {profileDropdownOpen && (
@@ -455,6 +461,7 @@ export default function Navbar() {
                     {(user.role === 'ADMIN' || user.role === 'EMPLOYEE') && (
                       <Link
                         href="/admin"
+                        onClick={() => setProfileDropdownOpen(false)}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -471,6 +478,7 @@ export default function Navbar() {
                     )}
                     <Link
                       href="/cuenta"
+                      onClick={() => setProfileDropdownOpen(false)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -486,6 +494,7 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/cuenta?tab=pedidos"
+                      onClick={() => setProfileDropdownOpen(false)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -501,7 +510,10 @@ export default function Navbar() {
                     </Link>
                     <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '6px 0' }} />
                     <button
-                      onClick={logout}
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        logout();
+                      }}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -511,6 +523,9 @@ export default function Navbar() {
                         fontSize: '14px',
                         color: 'var(--error)',
                         textAlign: 'left',
+                        cursor: 'pointer',
+                        background: 'none',
+                        border: 'none',
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--background-alt)')}
                       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
