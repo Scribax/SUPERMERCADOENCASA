@@ -36,6 +36,11 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
   // Tabs
   const [activeTab, setActiveTab] = useState<'desc' | 'nutrition' | 'specs'>('desc');
 
+  // Parse nutrition info
+  let nutrition: any = null;
+  try { if ((product as any).nutritionInfo) nutrition = JSON.parse((product as any).nutritionInfo); } catch {}
+  const hasNutrition = nutrition?.enabled === true;
+
   // Review Form
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
@@ -474,35 +479,34 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
           <button
             onClick={() => setActiveTab('desc')}
             style={{
-              padding: '12px 16px',
-              fontSize: '16px',
-              fontWeight: '700',
+              padding: '12px 16px', fontSize: '16px', fontWeight: '700',
               color: activeTab === 'desc' ? 'var(--primary)' : 'var(--foreground-muted)',
               borderBottom: activeTab === 'desc' ? '3px solid var(--primary)' : 'none',
+              background: 'none', border: 'none', cursor: 'pointer',
             }}
           >
             Descripción
           </button>
-          <button
-            onClick={() => setActiveTab('nutrition')}
-            style={{
-              padding: '12px 16px',
-              fontSize: '16px',
-              fontWeight: '700',
-              color: activeTab === 'nutrition' ? 'var(--primary)' : 'var(--foreground-muted)',
-              borderBottom: activeTab === 'nutrition' ? '3px solid var(--primary)' : 'none',
-            }}
-          >
-            Información Nutricional
-          </button>
+          {hasNutrition && (
+            <button
+              onClick={() => setActiveTab('nutrition')}
+              style={{
+                padding: '12px 16px', fontSize: '16px', fontWeight: '700',
+                color: activeTab === 'nutrition' ? 'var(--primary)' : 'var(--foreground-muted)',
+                borderBottom: activeTab === 'nutrition' ? '3px solid var(--primary)' : 'none',
+                background: 'none', border: 'none', cursor: 'pointer',
+              }}
+            >
+              Información Nutricional
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('specs')}
             style={{
-              padding: '12px 16px',
-              fontSize: '16px',
-              fontWeight: '700',
+              padding: '12px 16px', fontSize: '16px', fontWeight: '700',
               color: activeTab === 'specs' ? 'var(--primary)' : 'var(--foreground-muted)',
               borderBottom: activeTab === 'specs' ? '3px solid var(--primary)' : 'none',
+              background: 'none', border: 'none', cursor: 'pointer',
             }}
           >
             Ficha Técnica
@@ -517,7 +521,7 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
             </p>
           )}
 
-          {activeTab === 'nutrition' && (
+          {activeTab === 'nutrition' && hasNutrition && (
             <div style={{ maxWidth: '320px', border: '3px solid black', padding: '16px', fontFamily: 'Arial, sans-serif' }}>
               <h3 style={{ fontSize: '24px', fontWeight: '800', textAlign: 'center', borderBottom: '10px solid black', paddingBottom: '4px', textTransform: 'uppercase' }}>
                 Información Nutricional
@@ -529,32 +533,38 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
                 <span>Cantidad por porción</span>
                 <span>% VD *</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
-                <span><strong>Valor Energético</strong> (120 kcal)</span>
-                <span>6%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
-                <span>Carbohidratos (15g)</span>
-                <span>5%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
-                <span>Proteínas (3.2g)</span>
-                <span>4%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
-                <span>Grasas Totales (2.5g)</span>
-                <span>3%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
-                <span>Fibra Alimentaria (1g)</span>
-                <span>4%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '5px solid black', fontSize: '13px', padding: '4px 0' }}>
-                <span>Sodio (85mg)</span>
-                <span>4%</span>
-              </div>
+              {nutrition.calories && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
+                  <span><strong>Valor Energético</strong> ({nutrition.calories} kcal)</span><span>-</span>
+                </div>
+              )}
+              {nutrition.carbs && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
+                  <span>Carbohidratos ({nutrition.carbs}g)</span><span>-</span>
+                </div>
+              )}
+              {nutrition.protein && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
+                  <span>Proteínas ({nutrition.protein}g)</span><span>-</span>
+                </div>
+              )}
+              {nutrition.fat && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
+                  <span>Grasas Totales ({nutrition.fat}g)</span><span>-</span>
+                </div>
+              )}
+              {nutrition.fiber && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid black', fontSize: '13px', padding: '4px 0' }}>
+                  <span>Fibra Alimentaria ({nutrition.fiber}g)</span><span>-</span>
+                </div>
+              )}
+              {nutrition.sodium && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '5px solid black', fontSize: '13px', padding: '4px 0' }}>
+                  <span>Sodio ({nutrition.sodium}mg)</span><span>-</span>
+                </div>
+              )}
               <p style={{ fontSize: '11px', color: '#555555', marginTop: '8px', lineHeight: '1.3' }}>
-                * % Valores Diarios con base a una dieta de 2.000 kcal u 8.400 kJ. Sus valores diarios pueden ser mayores o menores dependiendo de sus necesidades energéticas.
+                * % Valores Diarios con base a una dieta de 2.000 kcal u 8.400 kJ.
               </p>
             </div>
           )}

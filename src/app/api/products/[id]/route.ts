@@ -79,6 +79,7 @@ export async function PUT(
       brandId,
       categoryId,
       images,
+      nutritionInfo,
       metaTitle,
       metaDescription,
       isActive,
@@ -105,6 +106,7 @@ export async function PUT(
     if (brandId !== undefined) updatedData.brandId = brandId || null;
     if (categoryId !== undefined) updatedData.categoryId = categoryId || null;
     if (images !== undefined) updatedData.images = images;
+    if (nutritionInfo !== undefined) updatedData.nutritionInfo = nutritionInfo || null;
     if (metaTitle !== undefined) updatedData.metaTitle = metaTitle;
     if (metaDescription !== undefined) updatedData.metaDescription = metaDescription;
     if (isActive !== undefined) updatedData.isActive = isActive;

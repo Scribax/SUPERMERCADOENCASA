@@ -94,6 +94,7 @@ model Product {
   categoryId      String?
   category        Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   images          String         // Comma-separated or JSON string of image URLs
+  nutritionInfo   String?        // JSON: {"calories":"","fat":"","carbs":"","protein":"","fiber":"","sodium":"","enabled":false}
   metaTitle       String?
   metaDescription String?
   createdAt       DateTime       @default(now())

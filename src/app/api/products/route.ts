@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
       brandId,
       categoryId,
       images,
+      nutritionInfo,
       metaTitle,
       metaDescription,
     } = body;
@@ -195,6 +196,7 @@ export async function POST(request: NextRequest) {
         brandId: brandId || null,
         categoryId: categoryId || null,
         images: images || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600',
+        nutritionInfo: nutritionInfo || null,
         metaTitle: metaTitle || `${name} | Superencasa`,
         metaDescription: metaDescription || description.slice(0, 155),
         inventoryLogs: {

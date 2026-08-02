@@ -32,6 +32,13 @@ export default function AdminProducts() {
     categoryId: '',
     brandId: '',
     isActive: true,
+    nutritionEnabled: false,
+    nutritionCalories: '',
+    nutritionFat: '',
+    nutritionCarbs: '',
+    nutritionProtein: '',
+    nutritionFiber: '',
+    nutritionSodium: '',
   });
 
   const [saving, setSaving] = useState(false);
@@ -120,6 +127,13 @@ export default function AdminProducts() {
       categoryId: categories[0]?.id || '',
       brandId: brands[0]?.id || '',
       isActive: true,
+      nutritionEnabled: false,
+      nutritionCalories: '',
+      nutritionFat: '',
+      nutritionCarbs: '',
+      nutritionProtein: '',
+      nutritionFiber: '',
+      nutritionSodium: '',
     });
     setIsModalOpen(true);
   };
@@ -139,7 +153,30 @@ export default function AdminProducts() {
       categoryId: product.categoryId || '',
       brandId: product.brandId || '',
       isActive: product.isActive,
+      nutritionEnabled: false,
+      nutritionCalories: '',
+      nutritionFat: '',
+      nutritionCarbs: '',
+      nutritionProtein: '',
+      nutritionFiber: '',
+      nutritionSodium: '',
     });
+    // Parse nutrition JSON if present
+    if (product.nutritionInfo) {
+      try {
+        const n = JSON.parse(product.nutritionInfo);
+        setForm(prev => ({
+          ...prev,
+          nutritionEnabled: n.enabled || false,
+          nutritionCalories: n.calories || '',
+          nutritionFat: n.fat || '',
+          nutritionCarbs: n.carbs || '',
+          nutritionProtein: n.protein || '',
+          nutritionFiber: n.fiber || '',
+          nutritionSodium: n.sodium || '',
+        }));
+      } catch {}
+    }
     setIsModalOpen(true);
   };
 
@@ -153,6 +190,15 @@ export default function AdminProducts() {
       offerPrice: form.offerPrice ? parseFloat(form.offerPrice) : null,
       stock: parseInt(form.stock),
       weight: parseFloat(form.weight),
+      nutritionInfo: form.nutritionEnabled ? JSON.stringify({
+        enabled: true,
+        calories: form.nutritionCalories,
+        fat: form.nutritionFat,
+        carbs: form.nutritionCarbs,
+        protein: form.nutritionProtein,
+        fiber: form.nutritionFiber,
+        sodium: form.nutritionSodium,
+      }) : null,
     };
 
     try {
@@ -585,6 +631,52 @@ export default function AdminProducts() {
                   />
                   Producto Habilitado (Visible en catálogo)
                 </label>
+              </div>
+
+              {/* Información Nutricional */}
+              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '16px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', marginBottom: form.nutritionEnabled ? '12px' : '0' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.nutritionEnabled}
+                    onChange={(e) => setForm({ ...form, nutritionEnabled: e.target.checked })}
+                  />
+                  📊 Mostrar Información Nutricional
+                </label>
+                {form.nutritionEnabled && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '8px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '2px' }}>Calorías (kcal)</label>
+                      <input type="text" placeholder="250" value={form.nutritionCalories} onChange={(e) => setForm({ ...form, nutritionCalories: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '2px' }}>Grasas (g)</label>
+                      <input type="text" placeholder="12" value={form.nutritionFat} onChange={(e) => setForm({ ...form, nutritionFat: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '2px' }}>Carbohidratos (g)</label>
+                      <input type="text" placeholder="30" value={form.nutritionCarbs} onChange={(e) => setForm({ ...form, nutritionCarbs: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '2px' }}>Proteínas (g)</label>
+                      <input type="text" placeholder="8" value={form.nutritionProtein} onChange={(e) => setForm({ ...form, nutritionProtein: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '2px' }}>Fibra (g)</label>
+                      <input type="text" placeholder="3" value={form.nutritionFiber} onChange={(e) => setForm({ ...form, nutritionFiber: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '12px' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '2px' }}>Sodio (mg)</label>
+                      <input type="text" placeholder="120" value={form.nutritionSodium} onChange={(e) => setForm({ ...form, nutritionSodium: e.target.value })}
+                        style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '12px' }} />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Action buttons */}
