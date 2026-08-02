@@ -52,10 +52,11 @@ function CuentaContent() {
     setActiveTab(tabParam);
   }, [tabParam]);
 
-  // Redirect if not logged in
+  // Redirect if not logged in — with guard to prevent loops
+  const redirectedRef = React.useRef(false);
   useEffect(() => {
-    if (!loading && !user) {
-      toast.info('Iniciá sesión para acceder a tu cuenta.');
+    if (!loading && !user && !redirectedRef.current) {
+      redirectedRef.current = true;
       router.push('/login?redirect=/cuenta');
     } else if (user) {
       setProfileForm({

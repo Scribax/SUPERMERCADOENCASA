@@ -51,7 +51,13 @@ export function middleware(request: NextRequest) {
   }
 
   // Redirect authenticated users trying to access login/register
+  // But NOT if they just came from /cuenta (avoids redirect loop)
   if (isAuthPage && user) {
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || '';
+    if (redirectTo.startsWith('/cuenta')) {
+      // Let them proceed to login page — the login form will handle the redirect
+      return NextResponse.next();
+    }
     if (user.role === 'ADMIN' || user.role === 'EMPLOYEE') {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
