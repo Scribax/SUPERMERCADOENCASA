@@ -7,7 +7,7 @@ import { useCart, Product } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/Toast';
 import ProductCard from '@/components/ui/ProductCard';
-import { Heart, ShoppingCart, Plus, Minus, Star, Share2, Clipboard, ShieldCheck, RefreshCw, Sparkles, ArrowLeft, Home } from 'lucide-react';
+import { Heart, ShoppingCart, Plus, Minus, Star, Share2, Clipboard, ShieldCheck, RefreshCw, Sparkles, ArrowLeft, Home, ShoppingBag } from 'lucide-react';
 
 interface ClientProps {
   product: Product & {
@@ -21,7 +21,7 @@ interface ClientProps {
 }
 
 export default function ProductDetailClient({ product, relatedProducts, avgRating, reviewCount }: ClientProps) {
-  const { addToCart, toggleFavorite, isFavorite, addToHistory, promotions } = useCart();
+  const { addToCart, toggleFavorite, isFavorite, addToHistory, promotions, cart, setCartOpen } = useCart();
   const { user } = useAuth();
   const toast = useToast();
   const router = useRouter();
@@ -128,6 +128,23 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
             cursor: 'pointer',
           }}>
             <ArrowLeft size={16} /> Volver
+          </button>
+          <button onClick={() => setCartOpen(true)} style={{
+            display: 'flex', alignItems: 'center', gap: '6px', color: '#FFFFFF', fontWeight: '700', fontSize: '13px',
+            border: 'none', borderRadius: '8px', padding: '8px 14px', backgroundColor: '#0E4FAF',
+            cursor: 'pointer', position: 'relative', boxShadow: '0 2px 6px rgba(14,79,175,0.3)',
+          }}>
+            <ShoppingBag size={16} /> Mi carrito
+            {cart.length > 0 && (
+              <span style={{
+                position: 'absolute', top: '-6px', right: '-6px',
+                backgroundColor: '#EF4444', color: '#FFF', fontSize: '10px', fontWeight: '800',
+                width: '18px', height: '18px', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {cart.reduce((s, i) => s + i.quantity, 0)}
+              </span>
+            )}
           </button>
         </div>
       </div>
