@@ -44,7 +44,8 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
   // Add to recently viewed on mount
   useEffect(() => {
     addToHistory(product.id);
-  }, [product.id, addToHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   const currentPrice = product.offerPrice !== null && product.offerPrice !== undefined ? product.offerPrice : product.price;
   const favorited = isFavorite(product.id);
