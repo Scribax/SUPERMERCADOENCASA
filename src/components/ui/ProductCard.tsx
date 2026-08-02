@@ -44,65 +44,80 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div
         className="product-card"
         style={{
-          backgroundColor: 'var(--card-bg)',
-          border: '1px solid var(--border-light)',
-          borderRadius: 'var(--radius-md)',
-          padding: '16px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '14px',
+          padding: '0',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
           height: '100%',
-          boxShadow: 'var(--shadow-sm)',
-          transition: 'all var(--transition-normal)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          transition: 'all 0.25s ease',
           cursor: 'pointer',
+          overflow: 'hidden',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-4px)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-          e.currentTarget.style.borderColor = 'var(--border)';
+          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+          e.currentTarget.style.borderColor = '#CBD5E1';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-          e.currentTarget.style.borderColor = 'var(--border-light)';
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
+          e.currentTarget.style.borderColor = '#E2E8F0';
         }}
       >
         <Link href={`/productos/${product.slug}`} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          {/* Card Top / Badges */}
-          <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--radius-sm)', marginBottom: '12px' }}>
-            {/* Image */}
+          {/* Card Top / Image + Badges */}
+          <div style={{ position: 'relative', overflow: 'hidden', height: '190px' }}>
             <img
               src={product.images.split(',')[0]}
               alt={product.name}
               style={{
                 width: '100%',
-                height: '180px',
+                height: '100%',
                 objectFit: 'cover',
-                transition: 'transform var(--transition-slow)',
+                transition: 'transform 0.4s ease',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             />
 
-            {/* Discount Badge */}
+            {/* Discount Badge - naranja destacado */}
             {discountPercent > 0 && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: '8px',
-                  left: '8px',
-                  backgroundColor: 'var(--accent)',
-                  color: 'white',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  padding: '4px 8px',
-                  borderRadius: 'var(--radius-xs)',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                {discountPercent}% OFF
+              <span style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                background: 'linear-gradient(135deg, #F97316 0%, #EF4444 100%)',
+                color: 'white',
+                fontSize: '12px',
+                fontWeight: '800',
+                padding: '5px 10px',
+                borderRadius: '6px',
+                boxShadow: '0 2px 8px rgba(239,68,68,0.35)',
+                letterSpacing: '0.3px',
+              }}>
+                -{discountPercent}% OFF
               </span>
+            )}
+
+            {/* Out of stock overlay */}
+            {product.stock === 0 && (
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                color: '#FFFFFF',
+                fontSize: '10px',
+                fontWeight: '700',
+                padding: '4px 10px',
+                borderRadius: '4px',
+              }}>
+                Sin stock
+              </div>
             )}
 
             {/* Favorites Icon */}
@@ -110,27 +125,27 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={handleFavoriteToggle}
               style={{
                 position: 'absolute',
-                top: '8px',
-                right: '8px',
-                backgroundColor: 'var(--card-bg)',
-                border: '1px solid var(--border-light)',
+                top: '10px',
+                right: '10px',
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                border: '1px solid #E2E8F0',
                 borderRadius: '50%',
-                width: '32px',
-                height: '32px',
+                width: '34px',
+                height: '34px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: 'var(--shadow-sm)',
-                color: favorited ? 'var(--error)' : 'var(--foreground-muted)',
-                transition: 'transform var(--transition-fast)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                color: favorited ? '#EF4444' : '#94A3B8',
+                transition: 'transform 0.2s',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.15)')}
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             >
-              <Heart size={16} fill={favorited ? 'var(--error)' : 'none'} />
+              <Heart size={16} fill={favorited ? '#EF4444' : 'none'} />
             </button>
 
-            {/* Quick View Button (Reveals on hover desktop) */}
+            {/* Quick View */}
             <button
               onClick={handleOpenQuickView}
               style={{
@@ -138,100 +153,105 @@ export default function ProductCard({ product }: ProductCardProps) {
                 bottom: '8px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                backgroundColor: 'var(--card-bg)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-full)',
-                padding: '6px 12px',
+                backgroundColor: 'rgba(255,255,255,0.95)',
+                border: '1px solid #E2E8F0',
+                borderRadius: '20px',
+                padding: '5px 14px',
                 fontSize: '11px',
                 fontWeight: '600',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                boxShadow: 'var(--shadow-md)',
-                color: 'var(--foreground)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                color: '#475569',
               }}
             >
               <Eye size={12} /> Vista rápida
             </button>
           </div>
 
-          {/* Card Middle / Details */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <span style={{ fontSize: '11px', color: 'var(--foreground-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {product.sku}
-            </span>
-            <h3
-              style={{
-                fontSize: '15px',
-                fontWeight: '600',
-                height: '42px',
-                overflow: 'hidden',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                lineHeight: '1.4',
-                color: 'var(--foreground)',
-              }}
-            >
+          {/* Card Body */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '12px 14px', gap: '6px' }}>
+            <h3 style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              height: '36px',
+              overflow: 'hidden',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: '1.35',
+              color: '#1E293B',
+              margin: 0,
+            }}>
               {product.name}
             </h3>
 
-            {/* Simulated Rating */}
+            {/* Rating */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ display: 'flex', color: '#FFB300' }}>
-                <Star size={12} fill="#FFB300" />
-                <Star size={12} fill="#FFB300" />
-                <Star size={12} fill="#FFB300" />
-                <Star size={12} fill="#FFB300" />
-                <Star size={12} fill="#FFB300" />
+              <div style={{ display: 'flex', color: '#F59E0B' }}>
+                {[1,2,3,4,5].map(i => <Star key={i} size={11} fill="#F59E0B" />)}
               </div>
-              <span style={{ fontSize: '11px', color: 'var(--foreground-muted)' }}>(5)</span>
+              <span style={{ fontSize: '10px', color: '#94A3B8' }}>(5)</span>
             </div>
 
-            {/* Price display */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-              <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--primary)' }}>
-                ${currentPrice.toFixed(2)}
+            {/* Price */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: 'auto' }}>
+              <span style={{ fontSize: '20px', fontWeight: '800', color: '#0E4FAF' }}>
+                ${currentPrice.toLocaleString('es-AR')}
               </span>
               {product.offerPrice && (
-                <span style={{ fontSize: '13px', color: 'var(--foreground-muted)', textDecoration: 'line-through' }}>
-                  ${product.price.toFixed(2)}
+                <span style={{ fontSize: '13px', color: '#94A3B8', textDecoration: 'line-through' }}>
+                  ${product.price.toLocaleString('es-AR')}
                 </span>
               )}
             </div>
+
+            {/* Installments hint */}
+            <span style={{ fontSize: '11px', color: '#22C55E', fontWeight: '600' }}>
+              {product.offerPrice ? '¡Oferta por tiempo limitado!' : '3 cuotas sin interés'}
+            </span>
           </div>
         </Link>
 
-        {/* Card Bottom / Add Button */}
-        <button
-          onClick={handleAddToCart}
-          disabled={product.stock === 0}
-          style={{
-            width: '100%',
-            backgroundColor: product.stock === 0 ? 'var(--border)' : 'var(--primary)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            padding: '10px',
-            marginTop: '12px',
-            fontSize: '13px',
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            transition: 'background var(--transition-fast)',
-          }}
-          onMouseEnter={(e) => {
-            if (product.stock > 0) e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-          }}
-          onMouseLeave={(e) => {
-            if (product.stock > 0) e.currentTarget.style.backgroundColor = 'var(--primary)';
-          }}
-        >
-          <ShoppingCart size={15} />
-          {product.stock === 0 ? 'Sin stock' : 'Agregar al carrito'}
-        </button>
+        {/* Add to Cart Button */}
+        <div style={{ padding: '0 14px 14px' }}>
+          <button
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            style={{
+              width: '100%',
+              backgroundColor: product.stock === 0 ? '#CBD5E1' : '#0E4FAF',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '10px',
+              fontSize: '13px',
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
+              transition: 'background 0.2s, transform 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              if (product.stock > 0) {
+                e.currentTarget.style.backgroundColor = '#1565C0';
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (product.stock > 0) {
+                e.currentTarget.style.backgroundColor = '#0E4FAF';
+                e.currentTarget.style.transform = 'scale(1)';
+              }
+            }}
+          >
+            <ShoppingCart size={15} />
+            {product.stock === 0 ? 'Sin stock' : 'Agregar'}
+          </button>
+        </div>
       </div>
 
       {/* Quick View Modal */}
@@ -258,16 +278,14 @@ export default function ProductCard({ product }: ProductCardProps) {
               transform: 'translate(-50%, -50%)',
               width: '90%',
               maxWidth: '800px',
-              backgroundColor: 'var(--card-bg)',
-              boxShadow: 'var(--shadow-xl)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '24px',
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
+              borderRadius: '16px',
+              padding: '28px',
               zIndex: 10001,
-              animation: 'modal-scale-up 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
             className="quickview-modal"
           >
-            {/* Close */}
             <button
               onClick={() => setIsQuickViewOpen(false)}
               style={{
@@ -276,99 +294,76 @@ export default function ProductCard({ product }: ProductCardProps) {
                 right: '16px',
                 padding: '6px',
                 borderRadius: '50%',
-                backgroundColor: 'var(--background-alt)',
+                backgroundColor: '#F1F5F9',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                border: 'none',
+                cursor: 'pointer',
               }}
             >
               <X size={20} />
             </button>
 
-            {/* Body */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%' }}>
-              {/* Left Column: Image */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img
                   src={product.images.split(',')[0]}
                   alt={product.name}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '300px',
-                    objectFit: 'contain',
-                    borderRadius: 'var(--radius-md)',
-                  }}
+                  style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: '12px' }}
                 />
               </div>
-
-              {/* Right Column: Info */}
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
-                  <span style={{ fontSize: '12px', color: 'var(--foreground-muted)' }}>SKU: {product.sku}</span>
+                  <span style={{ fontSize: '12px', color: '#94A3B8' }}>SKU: {product.sku}</span>
                   <h2 style={{ fontSize: '22px', fontWeight: '700', marginTop: '4px', marginBottom: '8px' }}>{product.name}</h2>
-                  
-                  {/* Prices */}
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '16px' }}>
-                    <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--primary)' }}>
-                      ${currentPrice.toFixed(2)}
+                    <span style={{ fontSize: '24px', fontWeight: '800', color: '#0E4FAF' }}>
+                      ${currentPrice.toLocaleString('es-AR')}
                     </span>
                     {product.offerPrice && (
-                      <span style={{ fontSize: '16px', color: 'var(--foreground-muted)', textDecoration: 'line-through' }}>
-                        ${product.price.toFixed(2)}
+                      <span style={{ fontSize: '16px', color: '#94A3B8', textDecoration: 'line-through' }}>
+                        ${product.price.toLocaleString('es-AR')}
                       </span>
                     )}
                   </div>
-
-                  <p style={{ fontSize: '14px', color: 'var(--foreground-muted)', marginBottom: '20px', lineHeight: '1.6' }}>
+                  <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px', lineHeight: '1.6' }}>
                     {product.description}
                   </p>
-
-                  {/* Stock Alert */}
                   <div style={{ fontSize: '13px', marginBottom: '16px' }}>
                     {product.stock > 0 ? (
-                      <span style={{ color: 'var(--success)', fontWeight: '600' }}>Stock disponible: {product.stock} unidades</span>
+                      <span style={{ color: '#22C55E', fontWeight: '600' }}>Stock disponible: {product.stock} unidades</span>
                     ) : (
-                      <span style={{ color: 'var(--error)', fontWeight: '600' }}>Sin stock disponible</span>
+                      <span style={{ color: '#EF4444', fontWeight: '600' }}>Sin stock disponible</span>
                     )}
                   </div>
                 </div>
-
-                {/* Direct Action */}
                 {product.stock > 0 && (
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                    {/* Qty Counter */}
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)' }}>
-                      <button
-                        onClick={() => setQty(Math.max(1, qty - 1))}
-                        style={{ padding: '8px 12px', backgroundColor: 'var(--background-alt)' }}
-                      >
+                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #E2E8F0', borderRadius: '8px' }}>
+                      <button onClick={() => setQty(Math.max(1, qty - 1))} style={{ padding: '8px 12px', backgroundColor: '#F8FAFC', border: 'none', cursor: 'pointer' }}>
                         <Minus size={16} />
                       </button>
                       <span style={{ padding: '0 16px', fontWeight: '600' }}>{qty}</span>
-                      <button
-                        onClick={() => setQty(Math.min(product.stock, qty + 1))}
-                        style={{ padding: '8px 12px', backgroundColor: 'var(--background-alt)' }}
-                      >
+                      <button onClick={() => setQty(Math.min(product.stock, qty + 1))} style={{ padding: '8px 12px', backgroundColor: '#F8FAFC', border: 'none', cursor: 'pointer' }}>
                         <Plus size={16} />
                       </button>
                     </div>
-
                     <button
-                      onClick={() => {
-                        addToCart(product, qty);
-                        setIsQuickViewOpen(false);
-                      }}
+                      onClick={() => { addToCart(product, qty); setIsQuickViewOpen(false); }}
                       style={{
                         flex: 1,
-                        backgroundColor: 'var(--primary)',
+                        backgroundColor: '#0E4FAF',
                         color: 'white',
                         padding: '12px',
-                        borderRadius: 'var(--radius-sm)',
-                        fontWeight: '600',
+                        borderRadius: '8px',
+                        fontWeight: '700',
+                        border: 'none',
+                        cursor: 'pointer',
                         textAlign: 'center',
                       }}
                     >
-                      Añadir al carrito
+                      Agregar al carrito
                     </button>
                   </div>
                 )}
@@ -382,6 +377,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         @keyframes modal-scale-up {
           from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; }
           to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .quickview-modal {
+          animation: modal-scale-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
       `}</style>
     </>

@@ -113,3 +113,38 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const user = await getCurrentUser(request);
+    if (!user || user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const order = await prisma.order.findUnique({ where: { id } });
+    if (!order) {
+      return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 });
+    }
+
+    // Only allow deleting cancelled orders
+    if (order.status !== 'CANCELLED') {
+      return NextResponse.json({ error: 'Solo se pueden eliminar pedidos cancelados' }, { status: 400 });
+    }
+
+    // Delete order items first, then the order (SQLite cascade workaround)
+    await prisma.orderItem.deleteMany({ where: { orderId: id } });
+    await prisma.order.delete({ where: { id } });
+
+    return NextResponse.json({ success: true, message: 'Pedido eliminado' });
+  } catch (error: any) {
+    console.error('Error deleting order:', error);
+    return NextResponse.json(
+      { error: 'Error en el servidor al eliminar el pedido' },
+      { status: 500 }
+    );
+  }
+}

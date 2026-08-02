@@ -23,7 +23,7 @@ export default function Header() {
               <span style={{ color: '#74C33D' }}>encasa</span>
             </span>
             <span style={{ fontSize: '11px', color: '#64748B', marginTop: '2px', fontWeight: '500' }}>
-              Comprá fácil, recibí en tu casa
+              Compra fácil, recibe en casa
             </span>
           </div>
         </div>

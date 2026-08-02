@@ -65,7 +65,8 @@ function CuentaContent() {
       });
       setAddresses(user.addresses || []);
     }
-  }, [user, loading, router, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, loading]);
 
   // Fetch orders when orders tab active
   useEffect(() => {

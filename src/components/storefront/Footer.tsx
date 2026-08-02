@@ -1,71 +1,126 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { ShoppingCart, Mail, Phone, MapPin } from 'lucide-react';
 
+interface Locality {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+
 export default function Footer() {
+  const [config, setConfig] = useState({
+    store_name: 'Superencasa',
+    support_email: 'hola@superencasa.com.ar',
+    whatsapp_number: '+5491112345678',
+  });
+  const [localities, setLocalities] = useState<Locality[]>([]);
+
+  useEffect(() => {
+    // Load config
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.config) {
+          setConfig(prev => ({ ...prev, ...data.config }));
+        }
+      })
+      .catch(() => {});
+
+    // Load localities
+    fetch('/api/localities')
+      .then(res => res.json())
+      .then(data => {
+        if (data.localities) {
+          setLocalities(data.localities.filter((l: Locality) => l.isActive));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
-    <footer style={{ backgroundColor: '#0E4FAF', color: '#FFFFFF', paddingTop: '64px', paddingBottom: '32px', borderTop: '8px solid #74C33D' }}>
-      <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '0 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '48px' }}>
+    <footer style={{ backgroundColor: '#0B3D7A', color: '#FFFFFF', paddingTop: '48px', paddingBottom: '24px' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '32px', marginBottom: '36px' }}>
+          {/* Logo + About */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-              <ShoppingCart size={32} color="#74C33D" />
-              <span style={{ fontSize: '24px', fontWeight: '700', color: '#FFFFFF', letterSpacing: '-0.5px' }}>
-                Super<span style={{ color: '#74C33D' }}>encasa</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#74C33D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ShoppingCart size={20} color="#FFFFFF" />
+              </div>
+              <span style={{ fontSize: '22px', fontWeight: '800' }}>
+                {config.store_name.replace('Super', 'Super')}<span style={{ color: '#74C33D' }}>{config.store_name.includes('encasa') ? 'encasa' : ''}</span>
               </span>
             </div>
-            <p style={{ color: '#DBEAFE', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
-              Tu supermercado 100% online. Hacé tus compras de todos los días de la forma más rápida, fácil y segura.
+            <p style={{ color: '#93C5FD', fontSize: '13px', lineHeight: 1.6, marginBottom: '16px' }}>
+              Tu supermercado 100% online. Comprá fácil, recibí en casa.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#DBEAFE' }}>
-                <Phone size={18} color="#74C33D" />
-                <span>+54 9 11 1234-5678</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#BFDBFE' }}>
+                <Phone size={15} color="#74C33D" />
+                <span>{config.whatsapp_number}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#DBEAFE' }}>
-                <Mail size={18} color="#74C33D" />
-                <span>hola@superencasa.com.ar</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#BFDBFE' }}>
+                <Mail size={15} color="#74C33D" />
+                <span>{config.support_email}</span>
               </div>
             </div>
           </div>
 
+          {/* Navegación */}
           <div>
-            <h4 style={{ fontWeight: '700', fontSize: '18px', marginBottom: '24px', color: '#FFFFFF' }}>Navegación</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#DBEAFE' }}>
-              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Inicio</a></li>
-              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Todas las Ofertas</a></li>
-              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Rubros</a></li>
+            <h4 style={{ fontWeight: '700', fontSize: '15px', marginBottom: '16px', color: '#FFFFFF' }}>Navegación</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#BFDBFE' }}>
+              <li><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Inicio</a></li>
+              <li><a href="/productos" style={{ color: 'inherit', textDecoration: 'none' }}>Ofertas</a></li>
+              <li><a href="/productos" style={{ color: 'inherit', textDecoration: 'none' }}>Rubros</a></li>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Cómo Comprar</a></li>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Revendedores</a></li>
             </ul>
           </div>
 
+          {/* Ayuda */}
           <div>
-            <h4 style={{ fontWeight: '700', fontSize: '18px', marginBottom: '24px', color: '#FFFFFF' }}>Atención al Cliente</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#DBEAFE' }}>
+            <h4 style={{ fontWeight: '700', fontSize: '15px', marginBottom: '16px', color: '#FFFFFF' }}>Ayuda</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#BFDBFE' }}>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Preguntas Frecuentes</a></li>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Políticas de Envío</a></li>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Términos y Condiciones</a></li>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Botón de Arrepentimiento</a></li>
-              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Defensa al Consumidor</a></li>
             </ul>
           </div>
 
+          {/* Zonas de Cobertura */}
           <div>
-            <h4 style={{ fontWeight: '700', fontSize: '18px', marginBottom: '24px', color: '#FFFFFF' }}>Zonas de Cobertura</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#DBEAFE', backgroundColor: '#1662C9', padding: '20px', borderRadius: '12px', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Pigué</span></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Bahía Blanca</span></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Patagones</span></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} color="#74C33D" /> <span>Viedma</span></div>
-              <div style={{ marginTop: '8px', paddingTop: '12px', borderTop: '1px solid rgba(96, 165, 250, 0.3)', fontWeight: '500', color: '#FFFFFF' }}>
+            <h4 style={{ fontWeight: '700', fontSize: '15px', marginBottom: '16px', color: '#FFFFFF' }}>Zonas de Cobertura</h4>
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#BFDBFE',
+              backgroundColor: 'rgba(255,255,255,0.06)', padding: '16px', borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}>
+              {localities.length > 0 ? (
+                <>
+                  {localities.map(loc => (
+                    <div key={loc.id} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <MapPin size={14} color="#74C33D" /> <span>{loc.name}</span>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={14} color="#74C33D" /> <span>Pigué</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={14} color="#74C33D" /> <span>Bahía Blanca</span></div>
+                </>
+              )}
+              <div style={{ marginTop: '6px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', fontWeight: '500', color: '#FFFFFF', fontSize: '12px' }}>
                 Próximamente más ciudades 🚀
               </div>
             </div>
           </div>
         </div>
 
-        <div style={{ paddingTop: '32px', borderTop: '1px solid #1E40AF', fontSize: '14px', color: '#BFDBFE', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-          <p style={{ margin: 0 }}>© {new Date().getFullYear()} Superencasa. Todos los derechos reservados.</p>
+        <div style={{ paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#60A5FA', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+          <p style={{ margin: 0 }}>© {new Date().getFullYear()} {config.store_name}. Todos los derechos reservados.</p>
           <div style={{ display: 'flex', gap: '16px' }}>
             <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidad</a>
             <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Términos</a>

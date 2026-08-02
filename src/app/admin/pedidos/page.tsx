@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/Toast';
-import { Eye, ChevronUp, Printer, Phone, MapPin, X, FileText } from 'lucide-react';
+import { Eye, ChevronUp, Printer, Phone, MapPin, X, FileText, Trash2 } from 'lucide-react';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -164,6 +164,20 @@ export default function AdminOrders() {
 
   const toggleExpand = (orderId: string) => {
     setExpandedOrder((prev) => (prev === orderId ? null : orderId));
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm('¿Estás seguro de eliminar este pedido cancelado? Esta acción no se puede deshacer.')) return;
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Pedido eliminado');
+        fetchOrders();
+      } else {
+        toast.error(data.error || 'Error al eliminar');
+      }
+    } catch { toast.error('Error de red'); }
   };
 
   // Prefilled WhatsApp Status message trigger
@@ -408,6 +422,20 @@ export default function AdminOrders() {
                           >
                             <Phone size={16} />
                           </button>
+                          {order.status === 'CANCELLED' && (
+                            <button
+                              onClick={() => handleDeleteOrder(order.id)}
+                              style={{
+                                padding: '6px',
+                                borderRadius: 'var(--radius-xs)',
+                                backgroundColor: '#FFEBEE',
+                                color: '#C62828',
+                              }}
+                              title="Eliminar pedido cancelado"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

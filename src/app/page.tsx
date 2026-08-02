@@ -1,28 +1,30 @@
 import { prisma } from '@/lib/db';
 import TopBenefits from '@/components/storefront/TopBenefits';
 import Header from '@/components/storefront/Header';
-import Hero from '@/components/storefront/Hero';
+import HeroBanner from '@/components/storefront/HeroBanner';
+import SidebarCategories from '@/components/storefront/SidebarCategories';
+import HeroAffiliateCard from '@/components/storefront/HeroAffiliateCard';
 import CategorySlider from '@/components/storefront/CategorySlider';
 import FeaturedProducts from '@/components/storefront/FeaturedProducts';
 import Benefits from '@/components/storefront/Benefits';
 import Footer from '@/components/storefront/Footer';
+import CityBar from '@/components/storefront/CityBar';
 
 export default async function Home() {
   const [categories, offerProducts, newProducts] = await Promise.all([
-    prisma.category.findMany({ orderBy: { order: 'asc' }, take: 12 }),
+    prisma.category.findMany({ orderBy: { order: 'asc' } }),
     prisma.product.findMany({
       where: { isActive: true, offerPrice: { not: null } },
-      take: 10,
+      take: 12,
       orderBy: { updatedAt: 'desc' },
     }),
     prisma.product.findMany({
       where: { isActive: true },
-      take: 10,
+      take: 12,
       orderBy: { createdAt: 'desc' },
     }),
   ]);
 
-  // Serialize for client components
   const serializedCategories = categories.map(c => ({
     id: c.id,
     name: c.name,
@@ -50,23 +52,40 @@ export default async function Home() {
     <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <TopBenefits />
       <Header />
-      <main style={{ flex: 1, width: '100%' }}>
-        <div style={{ backgroundColor: '#E8EDF3', paddingTop: '16px', paddingBottom: '48px' }}>
-          <Hero categories={serializedCategories} />
+
+      {/* HERO + CATEGORÍAS: todo integrado */}
+      <section style={{ backgroundColor: '#E8EDF3', padding: '20px 16px 24px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          {/* Fila: Sidebar | Banner (+ Affiliate flotante) */}
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch' }}>
+            <aside style={{ width: '230px', flexShrink: 0, display: 'flex' }}>
+              <SidebarCategories categories={serializedCategories} />
+            </aside>
+            <div style={{ flex: 1, minWidth: 0, position: 'relative', display: 'flex' }}>
+              <HeroBanner />
+              <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 20, width: '250px' }}>
+                <HeroAffiliateCard />
+              </div>
+            </div>
+          </div>
+
+          {/* Categorías pegadas abajo del banner */}
           <CategorySlider categories={serializedCategories} />
         </div>
-        <div style={{ backgroundColor: '#F8FAFC' }}>
+      </section>
+
+      {/* Productos + Benefits */}
+      <main style={{ flex: 1, width: '100%' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 16px 24px' }}>
           <FeaturedProducts title="Ofertas destacadas" products={serializeProducts(offerProducts)} />
-        </div>
-        {newProducts.length > 0 && (
-          <div style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #F1F5F9' }}>
+          {newProducts.length > 0 && (
             <FeaturedProducts title="Recién llegados" products={serializeProducts(newProducts)} />
-          </div>
-        )}
-        <div style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #F1F5F9' }}>
+          )}
           <Benefits />
         </div>
       </main>
+
+      <CityBar />
       <Footer />
     </div>
   );
