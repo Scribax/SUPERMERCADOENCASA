@@ -155,6 +155,9 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
             <img
               src={activeImage}
               alt={product.name}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" fill="%23E2E8F0"><rect width="300" height="300"/><text x="150" y="150" text-anchor="middle" dy=".3em" fill="%2394A3B8" font-size="16">Sin imagen</text></svg>');
+              }}
               style={{
                 maxWidth: '100%',
                 maxHeight: '100%',
