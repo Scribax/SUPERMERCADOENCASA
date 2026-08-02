@@ -7,7 +7,7 @@ import { useCart, Product } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/Toast';
 import ProductCard from '@/components/ui/ProductCard';
-import { Heart, ShoppingCart, Plus, Minus, Star, Share2, Clipboard, ShieldCheck, RefreshCw, Sparkles } from 'lucide-react';
+import { Heart, ShoppingCart, Plus, Minus, Star, Share2, Clipboard, ShieldCheck, RefreshCw, Sparkles, ArrowLeft, Home } from 'lucide-react';
 
 interface ClientProps {
   product: Product & {
@@ -96,10 +96,40 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
   return (
     <div className="container" style={{ paddingTop: '30px', paddingBottom: '60px' }}>
       
-      {/* Breadcrumbs */}
-      <p style={{ fontSize: '13px', color: 'var(--foreground-muted)', marginBottom: '24px' }}>
-        Inicio &gt; Productos &gt; {product.category?.name || 'Supermercado'} &gt; <strong style={{ color: 'var(--foreground)' }}>{product.name}</strong>
-      </p>
+      {/* Breadcrumbs + Back button */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+        <p style={{ fontSize: '13px', color: '#94A3B8', margin: 0 }}>
+          <Link href="/" style={{ color: '#0E4FAF', textDecoration: 'none', fontWeight: '600' }}>Inicio</Link>
+          {' > '}
+          <Link href="/productos" style={{ color: '#0E4FAF', textDecoration: 'none', fontWeight: '600' }}>Productos</Link>
+          {product.category && (
+            <>
+              {' > '}
+              <Link href={`/productos?categoria=${product.category.slug}`} style={{ color: '#0E4FAF', textDecoration: 'none', fontWeight: '600' }}>
+                {product.category.name}
+              </Link>
+            </>
+          )}
+          {' > '}
+          <strong style={{ color: '#1E293B' }}>{product.name}</strong>
+        </p>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Link href="/" style={{
+            display: 'flex', alignItems: 'center', gap: '6px', color: '#0E4FAF', fontWeight: '600', fontSize: '13px',
+            textDecoration: 'none', padding: '8px 14px', borderRadius: '8px', border: '1px solid #DBEAFE',
+            backgroundColor: '#EFF6FF', transition: 'all 0.2s',
+          }}>
+            <Home size={16} /> Inicio
+          </Link>
+          <button onClick={() => router.back()} style={{
+            display: 'flex', alignItems: 'center', gap: '6px', color: '#475569', fontWeight: '600', fontSize: '13px',
+            border: '1px solid #E2E8F0', borderRadius: '8px', padding: '8px 14px', backgroundColor: '#FFFFFF',
+            cursor: 'pointer',
+          }}>
+            <ArrowLeft size={16} /> Volver
+          </button>
+        </div>
+      </div>
 
       {/* Main Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '40px', marginBottom: '50px' }}>

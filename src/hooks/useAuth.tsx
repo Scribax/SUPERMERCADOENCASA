@@ -95,6 +95,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
+      // Limpiar favoritos al cerrar sesión
+      localStorage.removeItem('superencasa_favs');
+      localStorage.removeItem('superencasa_cart');
       router.push('/');
       router.refresh();
     } catch (e) {
