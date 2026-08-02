@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface Locality {
   id: string;
@@ -38,8 +37,7 @@ export default function LocationSelector() {
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <motion.button
-        whileHover={{ backgroundColor: '#F1F5F9' }}
+      <button
         onClick={() => setOpen(!open)}
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
@@ -47,12 +45,15 @@ export default function LocationSelector() {
           padding: '8px 12px', borderRadius: '9999px', fontSize: '14px',
           fontWeight: '500', color: '#334155',
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer',
+          transition: 'background 0.15s',
         }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F1F5F9'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
       >
         <MapPin size={16} color="#0E4FAF" />
         <span>Enviar a: {selected}</span>
         <ChevronDown size={14} color="#64748B" />
-      </motion.button>
+      </button>
 
       {open && localities.length > 0 && (
         <div style={{
