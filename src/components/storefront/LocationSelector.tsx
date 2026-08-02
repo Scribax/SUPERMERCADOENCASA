@@ -31,14 +31,14 @@ export default function LocationSelector() {
     const close = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
   }, []);
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
-        onClick={() => setOpen(!open)}
+        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
           border: '1px solid #E2E8F0', backgroundColor: '#FFFFFF',
