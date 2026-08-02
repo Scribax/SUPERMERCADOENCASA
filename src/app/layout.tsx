@@ -3,7 +3,6 @@ import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import { AuthProvider } from '@/hooks/useAuth';
 import { CartProvider } from '@/hooks/useCart';
-import { ThemeProvider } from '@/hooks/useTheme';
 import CartDrawer from '@/components/cart/CartDrawer';
 
 export const metadata: Metadata = {
@@ -46,8 +45,7 @@ export default function RootLayout({
   return (
     <html lang="es" data-theme="light" suppressHydrationWarning>
       <body>
-        <ThemeProvider>
-          <ToastProvider>
+        <ToastProvider>
           <AuthProvider>
             <CartProvider>
               <main style={{ flex: 1 }}>
@@ -56,8 +54,7 @@ export default function RootLayout({
               <CartDrawer />
             </CartProvider>
           </AuthProvider>
-          </ToastProvider>
-        </ThemeProvider>
+        </ToastProvider>
         {/* Programmatically unregister stray service workers from other localhost projects */}
         <script
           dangerouslySetInnerHTML={{
