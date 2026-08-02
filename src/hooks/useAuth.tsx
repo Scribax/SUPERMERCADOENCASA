@@ -39,6 +39,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(data.user);
       } else {
         setUser(null);
+        // Si el token es inválido, borrar la cookie para evitar loops
+        if (res.status === 401) {
+          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        }
       }
     } catch (e) {
       setUser(null);
