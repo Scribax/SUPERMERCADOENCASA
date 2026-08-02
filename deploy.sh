@@ -1,109 +1,60 @@
 #!/bin/bash
-# Superencasa VPS Deployment Script for Debian/Ubuntu
-# Run this script as root or with sudo on your VPS
-
 set -e
 
-echo "=== Iniciando despliegue de Superencasa ==="
+echo "╔══════════════════════════════════════╗"
+echo "║   🛒 Superencasa - Deploy Script    ║"
+echo "╚══════════════════════════════════════╝"
+echo ""
 
-# 1. Actualizar paquetes del sistema
-echo "Actualizando paquetes del sistema..."
-apt update && apt upgrade -y
+cd /var/www/supermercadoencasa
 
-# 2. Instalar dependencias básicas
-echo "Instalando dependencias básicas..."
-apt install -y curl git build-essential nginx
+# 1. Actualizar código
+echo "📥 [1/7] Actualizando código desde GitHub..."
+git pull origin master
+echo ""
 
-# 3. Instalar Node.js LTS (v20)
-if ! command -v node &> /dev/null; then
-  echo "Instalando Node.js v20..."
-  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-  apt install -y nodejs
-else
-  echo "Node.js ya está instalado: $(node -v)"
-fi
-
-# 4. Instalar PM2 globalmente
-if ! command -v pm2 &> /dev/null; then
-  echo "Instalando PM2..."
-  npm install -g pm2
-else
-  echo "PM2 ya está instalado"
-fi
-
-# 5. Configurar base de datos y construir el proyecto
-echo "Instalando dependencias del proyecto..."
+# 2. Dependencias
+echo "📦 [2/7] Instalando dependencias..."
 npm install
+echo ""
 
-# Generar variables de entorno si no existen
-if [ ! -f .env ]; then
-  echo "Creando archivo .env de producción..."
-  JWT_SECRET=$(openssl rand -hex 32)
-  cat <<EOT > .env
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="$JWT_SECRET"
-PORT=3000
-NODE_ENV=production
-EOT
-fi
+# 3. Limpiar build anterior
+echo "🧹 [3/7] Limpiando build anterior..."
+rm -rf .next
+echo ""
 
-echo "Generando cliente de Prisma..."
+# 4. Base de datos
+echo "🗄️  [4/7] Preparando base de datos..."
 npx prisma generate
-
-echo "Ejecutando migraciones de base de datos..."
 npx prisma migrate deploy
+echo ""
 
-echo "Sembrando datos iniciales en la base de datos..."
-npx prisma db seed || echo "La base de datos ya contiene datos o el comando seed falló."
+# 5. Seeds
+echo "🌱 [5/7] Ejecutando seeds..."
+npx tsx prisma/seed.ts
+npx tsx prisma/seed-extra.ts
+npx tsx prisma/seed-configs.ts
+echo ""
 
-echo "Construyendo la aplicación Next.js..."
+# 6. Build
+echo "🔨 [6/7] Compilando aplicación..."
 npm run build
+echo ""
 
-# 6. Configurar e Iniciar PM2
-echo "Iniciando aplicación con PM2..."
-pm2 delete superencasa 2>/dev/null || true
-pm2 start "npm run start -- -p 3000" --name "superencasa"
-pm2 save
+# 7. Reiniciar PM2
+echo "🚀 [7/7] Reiniciando servidor..."
+pm2 restart superencasa
+sleep 3
+echo ""
 
-# 7. Configurar Nginx como Proxy Reverso
-echo "Configurando Nginx..."
-cat <<EOT > /etc/nginx/sites-available/superencasa
-server {
-    listen 80;
-    server_name 186.64.123.152; # Cambiar por tu dominio si tienes uno
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
-        
-        # Soporte para uploads grandes
-        client_max_body_size 10M;
-    }
-}
-EOT
-
-# Activar sitio y reiniciar Nginx
-ln -sf /etc/nginx/sites-available/superencasa /etc/nginx/sites-enabled/
-rm -f /etc/nginx/sites-enabled/default || true
-
-# Crear carpeta de subidas y dar permisos adecuados antes de reiniciar Nginx
-mkdir -p /var/www/supermercadoencasa/public/uploads
-
-# Dar permisos de ejecución (+x) a las carpetas intermedias para que Nginx (www-data) pueda acceder
-chmod +x /var/www
-chmod +x /var/www/supermercadoencasa
-chmod +x /var/www/supermercadoencasa/public
-
-# Permisos de lectura/escritura en la carpeta de subidas
-chmod -R 755 /var/www/supermercadoencasa/public/uploads || true
-chown -R www-data:www-data /var/www/supermercadoencasa/public/uploads || true
-
-nginx -t
-systemctl restart nginx
-
-echo "=== ¡Despliegue finalizado con éxito! ==="
-echo "La tienda ya está disponible en: http://186.64.123.152"
+# Verificación
+echo "═══════════════════════════════════════"
+echo "📊 Estado del servidor:"
+pm2 status superencasa
+echo ""
+echo "🌐 Probando conexión..."
+curl -s -o /dev/null -w "HTTP %{http_code}" http://localhost:3000
+echo ""
+echo ""
+echo "✅ ¡Deploy completado!"
+echo "═══════════════════════════════════════"
