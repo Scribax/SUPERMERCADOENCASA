@@ -4,10 +4,12 @@ import SearchBar from './SearchBar';
 import CartButton from './CartButton';
 import { ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 import Link from 'next/link';
 
 export default function Header() {
   const { user } = useAuth();
+  const { theme, toggle } = useTheme();
 
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', width: '100%' }}>
@@ -37,7 +39,20 @@ export default function Header() {
         </div>
 
         {/* Right Section: Account and Cart */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            style={{
+              width: '34px', height: '34px', borderRadius: '50%',
+              border: '1px solid #E2E8F0', backgroundColor: '#F8FAFC',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', fontSize: '16px', transition: 'all 0.2s',
+            }}
+            title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
           <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right', fontSize: '13px' }}>
             <span style={{ color: '#64748B', fontSize: '12px' }}>
               {user ? `Hola, ${user.name}` : 'Bienvenido'}
