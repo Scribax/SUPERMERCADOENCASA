@@ -139,6 +139,30 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 5);
 
+    // 7. Average ticket
+    const completedOrders = orders.filter(o => o.status !== 'CANCELLED' && o.status !== 'PENDING');
+    const avgTicket = completedOrders.length > 0
+      ? completedOrders.reduce((sum, o) => sum + o.total, 0) / completedOrders.length
+      : 0;
+
+    // 8. Category sales breakdown (from last 30 days)
+    const catSalesMap: Record<string, { name: string; total: number; count: number }> = {};
+    for (const order of orders) {
+      for (const item of order.items) {
+        const product = await prisma.product.findUnique({
+          where: { id: item.productId || '' },
+          select: { category: { select: { name: true } } },
+        });
+        const catName = product?.category?.name || 'Sin categoría';
+        if (!catSalesMap[catName]) catSalesMap[catName] = { name: catName, total: 0, count: 0 };
+        catSalesMap[catName].total += item.price * item.quantity;
+        catSalesMap[catName].count += item.quantity;
+      }
+    }
+    const categoryBreakdown = Object.values(catSalesMap)
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 6);
+
     return NextResponse.json({
       success: true,
       data: {
@@ -155,6 +179,8 @@ export async function GET(request: NextRequest) {
         lowStockProducts,
         chartData,
         topSellingProducts,
+        avgTicket,
+        categoryBreakdown,
       },
     });
   } catch (error) {
