@@ -135,8 +135,13 @@ export default function AdminOrders() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        toast.success(`Pedido #${orderId.slice(0, 8)} actualizado a ${newStatus}`);
-        fetchOrders(); // Refresh table
+        toast.success(`Pedido #${orderId.slice(0, 8)} actualizado a ${translateStatus(newStatus)}`);
+        // Auto-notificar por WhatsApp al despachar o entregar
+        if (newStatus === 'SHIPPED' || newStatus === 'DELIVERED' || newStatus === 'PREPARING') {
+          const order = orders.find(o => o.id === orderId);
+          if (order) sendWhatsAppUpdate({ ...order, status: newStatus });
+        }
+        fetchOrders();
       } else {
         toast.error(data.error || 'Error al actualizar pedido');
       }

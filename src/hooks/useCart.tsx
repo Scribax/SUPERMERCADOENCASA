@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/ui/Toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface Product {
   id: string;
@@ -84,12 +85,27 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCartOpen, setCartOpen] = useState(false);
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   
-  // Configs
   const [shippingCostLimit, setShippingCostLimit] = useState(290);
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(4500);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   const toast = useToast();
+  const { user } = useAuth();
+
+  // Sync favorites from API when user logs in
+  useEffect(() => {
+    if (user) {
+      fetch('/api/favorites')
+        .then(r => r.json())
+        .then(d => {
+          if (d.favorites) {
+            setFavorites(d.favorites);
+            localStorage.setItem('superencasa_favs', JSON.stringify(d.favorites));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   // Load cart, favorites, and history from localStorage on mount
   useEffect(() => {
@@ -241,6 +257,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setFavorites(newFavs);
     localStorage.setItem('superencasa_favs', JSON.stringify(newFavs));
+    // Sync to backend if logged in
+    if (user) {
+      fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      }).catch(() => {});
+    }
   };
 
   const isFavorite = (productId: string) => favorites.includes(productId);
