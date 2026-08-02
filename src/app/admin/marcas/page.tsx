@@ -20,6 +20,27 @@ export default function AdminBrands() {
 
   const toast = useToast();
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setForm({ ...form, logo: data.url });
+        toast.success('¡Logo subido!');
+      } else {
+        toast.error(data.error || 'Error al subir');
+      }
+    } catch { toast.error('Error de red'); }
+    finally { setUploadingImage(false); }
+  };
+
   const fetchBrands = async () => {
     try {
       const res = await fetch('/api/brands');
@@ -225,14 +246,32 @@ export default function AdminBrands() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Logo URL</label>
-                <input
-                  type="text"
-                  value={form.logo}
-                  placeholder="https://ejemplo.com/logo.png"
-                  onChange={(e) => setForm({ ...form, logo: e.target.value })}
-                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
-                />
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Logo</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={form.logo}
+                    placeholder="https://ejemplo.com/logo.png"
+                    onChange={(e) => setForm({ ...form, logo: e.target.value })}
+                    style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)', fontSize: '13px' }}
+                  />
+                  <label style={{
+                    display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px',
+                    backgroundColor: 'var(--primary-light)', color: 'var(--primary)',
+                    borderRadius: 'var(--radius-sm)', fontWeight: '700', fontSize: '12px',
+                    cursor: 'pointer', whiteSpace: 'nowrap',
+                  }}>
+                    {uploadingImage ? '...' : '📁 Subir'}
+                    <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} style={{ display: 'none' }} />
+                  </label>
+                </div>
+                {form.logo && (
+                  <div style={{ position: 'relative', width: '70px', height: '70px', marginTop: '10px' }}>
+                    <img src={form.logo} alt="Logo preview" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                    <button type="button" onClick={() => setForm({ ...form, logo: '' })}
+                      style={{ position: 'absolute', top: '-6px', right: '-6px', backgroundColor: 'var(--error)', color: '#FFF', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '11px', fontWeight: '700', cursor: 'pointer' }}>×</button>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '14px', borderTop: '1px solid var(--border-light)', paddingTop: '16px' }}>
