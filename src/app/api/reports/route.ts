@@ -63,25 +63,12 @@ export async function GET(request: NextRequest) {
       where: { role: 'CLIENT' },
     });
 
-    // 3. Count Orders by Status
-    const ordersByStatus = await prisma.order.groupBy({
-      by: ['status'],
-      _count: {
-        _all: true,
-      },
-    });
-
+    // 3. Count Orders by Status (manual - avoid groupBy for SQLite/libsql)
+    const allOrders = await prisma.order.findMany({ select: { status: true } });
     const statusCounts: Record<string, number> = {
-      PENDING: 0,
-      PREPARING: 0,
-      SHIPPED: 0,
-      DELIVERED: 0,
-      CANCELLED: 0,
+      PENDING: 0, PREPARING: 0, SHIPPED: 0, DELIVERED: 0, CANCELLED: 0,
     };
-
-    ordersByStatus.forEach((item) => {
-      statusCounts[item.status] = item._count._all;
-    });
+    allOrders.forEach(o => { if (statusCounts[o.status] !== undefined) statusCounts[o.status]++; });
 
     // Total orders count
     const totalOrdersCount = await prisma.order.count();
