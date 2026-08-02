@@ -146,14 +146,18 @@ export async function GET(request: NextRequest) {
       : 0;
 
     // 8. Category sales breakdown (from last 30 days)
+    // Get all products with their categories in one query
+    const allProductIds = [...new Set(orders.flatMap(o => o.items.map(i => i.productId).filter(Boolean)))];
+    const productsWithCat = await prisma.product.findMany({
+      where: { id: { in: allProductIds as string[] } },
+      select: { id: true, category: { select: { name: true } } },
+    });
+    const catMap = new Map(productsWithCat.map(p => [p.id, p.category?.name || 'Sin categoría']));
+
     const catSalesMap: Record<string, { name: string; total: number; count: number }> = {};
     for (const order of orders) {
       for (const item of order.items) {
-        const product = await prisma.product.findUnique({
-          where: { id: item.productId || '' },
-          select: { category: { select: { name: true } } },
-        });
-        const catName = product?.category?.name || 'Sin categoría';
+        const catName = item.productId ? (catMap.get(item.productId) || 'Sin categoría') : 'Sin categoría';
         if (!catSalesMap[catName]) catSalesMap[catName] = { name: catName, total: 0, count: 0 };
         catSalesMap[catName].total += item.price * item.quantity;
         catSalesMap[catName].count += item.quantity;
