@@ -638,7 +638,16 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
                 }}
               >
                 <h4 style={{ fontSize: '16px', fontWeight: '700' }}>Dejanos tu opinión</h4>
-                
+
+                {!user ? (
+                  <p style={{ fontSize: '14px', color: 'var(--foreground-muted)' }}>
+                    <Link href={`/login?redirect=/productos/${product.slug}`} style={{ color: 'var(--primary)', fontWeight: '600' }}>
+                      Iniciá sesión
+                    </Link>{' '}
+                    para dejar tu opinión.
+                  </p>
+                ) : (
+                  <>
                 {/* Rating selection stars */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '14px' }}>Calificación:</span>
@@ -688,6 +697,8 @@ export default function ProductDetailClient({ product, relatedProducts, avgRatin
                 >
                   {submittingReview ? 'Guardando...' : 'Enviar opinión'}
                 </button>
+                  </>
+                )}
               </form>
             ) : (
               <div
