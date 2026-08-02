@@ -72,9 +72,9 @@ export default function Footer() {
             <h4 style={{ fontWeight: '700', fontSize: '15px', marginBottom: '16px', color: '#FFFFFF' }}>Navegación</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#BFDBFE' }}>
               <li><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Inicio</a></li>
+              <li><a href="/como-funciona" style={{ color: 'inherit', textDecoration: 'none' }}>Cómo Funciona</a></li>
               <li><a href="/productos" style={{ color: 'inherit', textDecoration: 'none' }}>Ofertas</a></li>
               <li><a href="/productos" style={{ color: 'inherit', textDecoration: 'none' }}>Rubros</a></li>
-              <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Cómo Comprar</a></li>
               <li><a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Revendedores</a></li>
             </ul>
           </div>
