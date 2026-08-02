@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
 
 interface Locality {
@@ -12,7 +12,6 @@ export default function LocationSelector() {
   const [open, setOpen] = useState(false);
   const [localities, setLocalities] = useState<Locality[]>([]);
   const [selected, setSelected] = useState('Pigué');
-  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/localities')
@@ -27,57 +26,58 @@ export default function LocationSelector() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const close = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  }, []);
-
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <button
-        onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <div
+        onClick={() => setOpen(!open)}
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
           border: '1px solid #E2E8F0', backgroundColor: '#FFFFFF',
           padding: '8px 12px', borderRadius: '9999px', fontSize: '14px',
           fontWeight: '500', color: '#334155',
           boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', cursor: 'pointer',
-          transition: 'background 0.15s',
+          userSelect: 'none',
         }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F1F5F9'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
       >
         <MapPin size={16} color="#0E4FAF" />
         <span>Enviar a: {selected}</span>
         <ChevronDown size={14} color="#64748B" />
-      </button>
+      </div>
 
-      {open && localities.length > 0 && (
+      {open && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, marginTop: '4px',
           backgroundColor: '#FFF', border: '1px solid #E2E8F0', borderRadius: '12px',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 100, minWidth: '180px',
-          overflow: 'hidden',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.25)', zIndex: 99999, minWidth: '180px',
         }}>
-          {localities.map(loc => (
-            <button
+          {localities.length > 0 ? localities.map(loc => (
+            <div
               key={loc.id}
               onClick={() => { setSelected(loc.name); setOpen(false); }}
               style={{
-                display: 'flex', alignItems: 'center', gap: '10px', width: '100%',
-                padding: '10px 16px', border: 'none', background: loc.name === selected ? '#EFF6FF' : '#FFF',
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '10px 16px',
+                background: loc.name === selected ? '#EFF6FF' : '#FFF',
                 color: loc.name === selected ? '#0E4FAF' : '#334155',
                 fontSize: '13px', fontWeight: loc.name === selected ? '600' : '400',
-                cursor: 'pointer', textAlign: 'left',
+                cursor: 'pointer',
               }}
             >
               <MapPin size={14} color="#0E4FAF" />
               {loc.name}
-            </button>
-          ))}
+            </div>
+          )) : (
+            <div style={{ padding: '10px 16px', fontSize: '12px', color: '#94A3B8' }}>Cargando...</div>
+          )}
+          <div
+            onClick={() => setOpen(false)}
+            style={{
+              padding: '8px 16px', borderTop: '1px solid #F1F5F9',
+              fontSize: '12px', color: '#94A3B8', cursor: 'pointer', textAlign: 'center',
+            }}
+          >
+            Cerrar
+          </div>
         </div>
       )}
     </div>
