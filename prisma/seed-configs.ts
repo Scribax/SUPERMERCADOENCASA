@@ -10,6 +10,7 @@ async function main() {
     { key: 'hero_subtitle', value: 'Miles de productos, las mejores marcas y entrega rápida en tu ciudad.' },
     { key: 'hero_badge', value: '🚀 ENVÍOS GRATIS +$25.000' },
     { key: 'hero_button', value: 'Comprar ahora' },
+    { key: 'whatsapp_number', value: '+54 9 2923 651516', description: 'Número de WhatsApp de atención al cliente' },
     { key: 'benefits_1_title', value: 'Miles de clientes' },
     { key: 'benefits_1_desc', value: 'ya confían en nosotros' },
     { key: 'benefits_2_title', value: 'Comercios locales' },

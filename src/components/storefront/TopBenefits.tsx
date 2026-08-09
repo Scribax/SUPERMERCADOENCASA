@@ -9,7 +9,7 @@ const BENEFITS = [
 ];
 
 export default function TopBenefits() {
-  const [whatsapp, setWhatsapp] = useState('5491112345678');
+  const [whatsapp, setWhatsapp] = useState('5492923651516');
 
   useEffect(() => {
     fetch('/api/config')

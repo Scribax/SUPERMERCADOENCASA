@@ -222,7 +222,7 @@ export default function ComoFuncionaPage() {
           Super<span style={{ color: GREEN }}>EnCasa</span>
         </p>
         <p style={{ margin: '4px 0 16px' }}>Comprás para vos. Ganás recomendando.</p>
-        <a href="https://wa.me/5491112345678" target="_blank" rel="noopener" style={{
+        <a href="https://wa.me/5492923651516" target="_blank" rel="noopener" style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
           background: GREEN, color: '#FFF', padding: '10px 22px', borderRadius: '8px',
           fontWeight: '700', textDecoration: 'none', fontSize: '13px',

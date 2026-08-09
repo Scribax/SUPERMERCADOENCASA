@@ -12,7 +12,7 @@ export default function Footer() {
   const [config, setConfig] = useState({
     store_name: 'Superencasa',
     support_email: 'hola@superencasa.com.ar',
-    whatsapp_number: '+5491112345678',
+    whatsapp_number: '+54 9 2923 651516',
   });
   const [localities, setLocalities] = useState<Locality[]>([]);
 
