@@ -26,7 +26,7 @@ echo ""
 # 4. Base de datos
 echo "🗄️  [4/6] Aplicando migraciones de base de datos..."
 npx prisma generate
-npx prisma migrate deploy
+npx prisma migrate deploy || npx prisma db push
 echo ""
 
 # 5. Build
