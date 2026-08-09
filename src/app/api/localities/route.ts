@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { name, shippingCost, isActive } = await request.json();
+    const { name, shippingCost, minPurchase, isActive } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: 'El nombre es obligatorio' }, { status: 400 });
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         shippingCost: shippingCost !== undefined ? parseFloat(shippingCost) : 0,
+        minPurchase: minPurchase !== undefined ? parseFloat(minPurchase) : 0,
         isActive: isActive !== undefined ? isActive : true,
       },
     });

@@ -14,6 +14,7 @@ export default function AdminLocalities() {
   const [form, setForm] = useState({
     name: '',
     shippingCost: '0',
+    minPurchase: '0',
     isActive: true,
   });
 
@@ -45,6 +46,7 @@ export default function AdminLocalities() {
     setForm({
       name: '',
       shippingCost: '0',
+      minPurchase: '0',
       isActive: true,
     });
     setIsModalOpen(true);
@@ -54,7 +56,8 @@ export default function AdminLocalities() {
     setEditLocality(locality);
     setForm({
       name: locality.name,
-      shippingCost: locality.shippingCost.toString(),
+      shippingCost: locality.shippingCost ? locality.shippingCost.toString() : '0',
+      minPurchase: locality.minPurchase ? locality.minPurchase.toString() : '0',
       isActive: locality.isActive,
     });
     setIsModalOpen(true);
@@ -78,7 +81,8 @@ export default function AdminLocalities() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: form.name,
-          shippingCost: parseFloat(form.shippingCost),
+          shippingCost: parseFloat(form.shippingCost || '0'),
+          minPurchase: parseFloat(form.minPurchase || '0'),
           isActive: form.isActive,
         }),
       });
@@ -119,19 +123,17 @@ export default function AdminLocalities() {
     return <div>Cargando localidades...</div>;
   }
 
-  const activeCount = localities.filter(l => l.isActive).length;
-  const avgShipping = localities.length > 0 
-    ? localities.reduce((acc, l) => acc + l.shippingCost, 0) / localities.length 
-    : 0;
+  const activeCount = localities.filter((l) => l.isActive).length;
+  const avgShipping =
+    localities.length > 0 ? localities.reduce((acc, l) => acc + l.shippingCost, 0) / localities.length : 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-      
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '800' }}>Gestión de Localidades</h1>
-          <p style={{ color: 'var(--foreground-muted)' }}>Administrá las zonas de entrega y sus costos de envío.</p>
+          <p style={{ color: 'var(--foreground-muted)' }}>Administrá las zonas de entrega, costos de envío y compra mínima.</p>
         </div>
         <button
           onClick={handleOpenCreateModal}
@@ -174,6 +176,7 @@ export default function AdminLocalities() {
             <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left', color: 'var(--foreground-muted)' }}>
               <th style={{ padding: '16px' }}>Nombre</th>
               <th style={{ padding: '16px' }}>Costo de Envío ($)</th>
+              <th style={{ padding: '16px' }}>Compra Mínima ($)</th>
               <th style={{ padding: '16px' }}>Estado</th>
               <th style={{ padding: '16px', textAlign: 'right' }}>Acciones</th>
             </tr>
@@ -187,7 +190,10 @@ export default function AdminLocalities() {
                     {l.name}
                   </div>
                 </td>
-                <td style={{ padding: '16px' }}>${l.shippingCost.toFixed(2)}</td>
+                <td style={{ padding: '16px' }}>${l.shippingCost ? l.shippingCost.toFixed(2) : '0.00'}</td>
+                <td style={{ padding: '16px', fontWeight: '600', color: l.minPurchase > 0 ? '#0E4FAF' : '#64748B' }}>
+                  {l.minPurchase > 0 ? `$${l.minPurchase.toLocaleString('es-AR')}` : 'Sin mínimo'}
+                </td>
                 <td style={{ padding: '16px' }}>
                   {l.isActive ? (
                     <span style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: 'var(--radius-xs)', fontSize: '12px', fontWeight: '700' }}>Activo</span>
@@ -215,7 +221,7 @@ export default function AdminLocalities() {
             ))}
             {localities.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ padding: '32px', textAlign: 'center', color: 'var(--foreground-muted)' }}>
+                <td colSpan={5} style={{ padding: '32px', textAlign: 'center', color: 'var(--foreground-muted)' }}>
                   No hay localidades registradas.
                 </td>
               </tr>
@@ -235,7 +241,7 @@ export default function AdminLocalities() {
               left: '50%',
               transform: 'translate(-50%, -50%)',
               width: '90%',
-              maxWidth: '400px',
+              maxWidth: '420px',
               backgroundColor: 'var(--card-bg)',
               zIndex: 1001,
               padding: '30px',
@@ -247,7 +253,7 @@ export default function AdminLocalities() {
               <h3 style={{ fontSize: '18px', fontWeight: '800' }}>{editLocality ? 'Editar Localidad' : 'Nueva Localidad'}</h3>
               <button onClick={() => setIsModalOpen(false)}><X size={20} /></button>
             </div>
-            
+
             <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Nombre</label>
@@ -274,6 +280,22 @@ export default function AdminLocalities() {
               </div>
 
               <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '4px' }}>Monto Mínimo de Compra ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={form.minPurchase}
+                  onChange={(e) => setForm({ ...form, minPurchase: e.target.value })}
+                  placeholder="0 para sin mínimo"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
+                />
+                <p style={{ fontSize: '11px', color: 'var(--foreground-muted)', marginTop: '4px' }}>
+                  Dejar en 0 si no requiere un mínimo para enviar a esta zona.
+                </p>
+              </div>
+
+              <div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
@@ -283,9 +305,6 @@ export default function AdminLocalities() {
                   />
                   Localidad Activa
                 </label>
-                <p style={{ fontSize: '12px', color: 'var(--foreground-muted)', marginTop: '4px', marginLeft: '24px' }}>
-                  Si está inactiva, no aparecerá en el checkout.
-                </p>
               </div>
 
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '14px', borderTop: '1px solid var(--border-light)', paddingTop: '16px' }}>

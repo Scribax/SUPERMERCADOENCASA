@@ -13,7 +13,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const { name, shippingCost, isActive } = await request.json();
+    const { name, shippingCost, minPurchase, isActive } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: 'El nombre es obligatorio' }, { status: 400 });
@@ -35,6 +35,7 @@ export async function PUT(
       data: {
         name,
         shippingCost: shippingCost !== undefined ? parseFloat(shippingCost) : undefined,
+        minPurchase: minPurchase !== undefined ? parseFloat(minPurchase) : undefined,
         isActive: isActive !== undefined ? isActive : undefined,
       },
     });
