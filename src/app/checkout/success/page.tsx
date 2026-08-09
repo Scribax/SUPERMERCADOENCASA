@@ -237,29 +237,27 @@ function SuccessContent() {
 
       {/* ACTIONS */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} className="no-print">
-        {order.paymentMethod === 'TRANSFER' && (
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              backgroundColor: '#25D366',
-              color: 'white',
-              padding: '14px',
-              borderRadius: 'var(--radius-md)',
-              fontWeight: '700',
-              fontSize: '16px',
-              textAlign: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              boxShadow: 'var(--shadow-md)',
-            }}
-          >
-            <PhoneCall size={18} /> Enviar Comprobante por WhatsApp
-          </a>
-        )}
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            backgroundColor: '#25D366',
+            color: 'white',
+            padding: '14px',
+            borderRadius: 'var(--radius-md)',
+            fontWeight: '700',
+            fontSize: '16px',
+            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            boxShadow: 'var(--shadow-md)',
+          }}
+        >
+          <PhoneCall size={18} /> {order.paymentMethod === 'TRANSFER' ? 'Enviar Comprobante por WhatsApp' : 'Enviar detalle del pedido por WhatsApp'}
+        </a>
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button

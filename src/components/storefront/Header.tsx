@@ -1,6 +1,6 @@
 'use client';
 import LocationSelector from './LocationSelector';
-import SearchBar from './SearchBar';
+import LiveSearchModal from './LiveSearchModal';
 import CartButton from './CartButton';
 import { ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,7 +33,7 @@ export default function Header() {
           <div>
             <LocationSelector />
           </div>
-          <SearchBar />
+          <LiveSearchModal />
         </div>
 
         {/* Right Section: Account and Cart */}

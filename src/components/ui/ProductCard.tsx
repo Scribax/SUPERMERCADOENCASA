@@ -103,18 +103,37 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
 
+            {/* Nuevo Badge */}
+            {discountPercent === 0 && product.stock > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                backgroundColor: '#10B981',
+                color: 'white',
+                fontSize: '11px',
+                fontWeight: '800',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+              }}>
+                Nuevo
+              </span>
+            )}
+
             {/* Out of stock overlay */}
             {product.stock === 0 && (
               <div style={{
                 position: 'absolute',
                 top: '10px',
-                right: '10px',
-                backgroundColor: 'rgba(0,0,0,0.7)',
+                left: '10px',
+                backgroundColor: 'rgba(0,0,0,0.75)',
                 color: '#FFFFFF',
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: '700',
                 padding: '4px 10px',
-                borderRadius: '4px',
+                borderRadius: '6px',
               }}>
                 Sin stock
               </div>

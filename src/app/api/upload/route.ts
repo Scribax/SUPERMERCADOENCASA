@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'El tamaño de la imagen no debe superar los 5MB' }, { status: 400 });
     }
 
-    // 3. Read buffer and save file
+    // 3. Read buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -38,10 +38,15 @@ export async function POST(request: NextRequest) {
     const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${uniqueSuffix}-${sanitizedFilename}`;
 
-    // Define path
+    // Try Cloudinary CDN upload first
+    const { uploadToCloudinary } = await import('@/lib/cloudinary');
+    const cloudinaryUrl = await uploadToCloudinary(buffer, filename);
+    if (cloudinaryUrl) {
+      return NextResponse.json({ success: true, url: cloudinaryUrl });
+    }
+
+    // Fallback: Define local path & write file
     const uploadDir = join(process.cwd(), 'public', 'uploads');
-    
-    // Ensure uploads directory exists
     await mkdir(uploadDir, { recursive: true });
     
     const filePath = join(uploadDir, filename);
