@@ -13,7 +13,7 @@ export async function uploadToCloudinary(buffer: Buffer, filename: string): Prom
 
   try {
     const formData = new FormData();
-    const blob = new Blob([buffer]);
+    const blob = new Blob([new Uint8Array(buffer)]);
     formData.append('file', blob, filename);
     formData.append('upload_preset', uploadPreset);
 

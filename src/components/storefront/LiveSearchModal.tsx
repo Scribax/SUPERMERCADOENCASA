@@ -23,7 +23,7 @@ export default function LiveSearchModal() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -213,7 +213,7 @@ export default function LiveSearchModal() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            addItem(product as any, 1);
+                            addToCart(product as any, 1);
                           }}
                           title="Agregar al carrito"
                           style={{
