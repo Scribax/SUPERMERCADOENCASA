@@ -1,6 +1,6 @@
 /**
  * Email Notification Service for Supermercado en Casa
- * Supports SMTP (via Nodemailer) or Console logger fallback if SMTP env vars are not set.
+ * Supports Resend API (Direct HTTP), SMTP (Nodemailer), or Console fallback.
  */
 
 interface SendEmailOptions {
@@ -10,41 +10,74 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, html }: SendEmailOptions): Promise<boolean> {
+  const resendKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.EMAIL_FROM || 'Superencasa <onboarding@resend.dev>';
+
+  // 1. Try Resend API (Fastest & Most Reliable)
+  if (resendKey) {
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: [to],
+          subject,
+          html,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`[RESEND SUCCESS] Email sent to ${to} (ID: ${data.id})`);
+        return true;
+      } else {
+        console.error(`[RESEND API WARNING]`, data);
+      }
+    } catch (err) {
+      console.error('[RESEND FETCH ERROR]', err);
+    }
+  }
+
+  // 2. Fallback to Nodemailer SMTP if configured
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = parseInt(process.env.SMTP_PORT || '587');
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
 
-  if (!smtpHost || !smtpUser || !smtpPass) {
-    console.log(`[EMAIL LOG - SIMULATED] To: ${to} | Subject: "${subject}"`);
-    return true; // Graceful fallback
+  if (smtpHost && smtpUser && smtpPass) {
+    try {
+      const nodemailer = await import('nodemailer');
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      });
+
+      await transporter.sendMail({
+        from: `"Superencasa" <${smtpUser}>`,
+        to,
+        subject,
+        html,
+      });
+
+      console.log(`[SMTP SUCCESS] Delivered email to ${to}`);
+      return true;
+    } catch (error) {
+      console.error(`[SMTP ERROR] Failed to send to ${to}:`, error);
+    }
   }
 
-  try {
-    const nodemailer = await import('nodemailer');
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpPort === 465,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"Superencasa" <${smtpUser}>`,
-      to,
-      subject,
-      html,
-    });
-
-    console.log(`[EMAIL SENT] Successfully delivered to ${to}`);
-    return true;
-  } catch (error) {
-    console.error(`[EMAIL ERROR] Failed to send email to ${to}:`, error);
-    return false;
-  }
+  // 3. Fallback Logger
+  console.log(`[EMAIL LOG - SIMULATED] To: ${to} | Subject: "${subject}"`);
+  return true;
 }
 
 // 📧 HTML Template: Order Confirmation to Customer
