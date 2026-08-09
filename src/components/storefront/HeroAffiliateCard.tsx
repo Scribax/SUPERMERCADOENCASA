@@ -10,7 +10,7 @@ const BENEFITS = [
 
 export default function HeroAffiliateCard() {
   return (
-    <div style={{
+    <div className="hero-affiliate-card-box" style={{
       backgroundColor: '#0F172A',
       borderRadius: '14px',
       padding: '22px 20px',
@@ -40,7 +40,7 @@ export default function HeroAffiliateCard() {
           </span>
         </div>
 
-        {/* Title — más legible */}
+        {/* Title */}
         <h3 style={{
           fontSize: '18px',
           fontWeight: '800',
@@ -104,6 +104,14 @@ export default function HeroAffiliateCard() {
           Sumate ahora
         </motion.button>
       </div>
+
+      <style jsx global>{`
+        @media (max-width: 991px) {
+          .hero-affiliate-card-box {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

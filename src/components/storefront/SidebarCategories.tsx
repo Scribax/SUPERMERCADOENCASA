@@ -57,7 +57,7 @@ interface SidebarCategoriesProps {
 
 export default function SidebarCategories({ categories }: SidebarCategoriesProps) {
   return (
-    <div style={{
+    <div className="sidebar-categories-box" style={{
       backgroundColor: '#FFFFFF',
       borderRadius: '16px',
       boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.08)',
@@ -186,6 +186,14 @@ export default function SidebarCategories({ categories }: SidebarCategoriesProps
           </button>
         </div>
       </div>
+
+      <style jsx global>{`
+        @media (max-width: 991px) {
+          .sidebar-categories-box {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
