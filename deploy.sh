@@ -24,25 +24,18 @@ rm -rf .next
 echo ""
 
 # 4. Base de datos
-echo "🗄️  [4/7] Preparando base de datos..."
+echo "🗄️  [4/6] Aplicando migraciones de base de datos..."
 npx prisma generate
 npx prisma migrate deploy
 echo ""
 
-# 5. Seeds
-echo "🌱 [5/7] Ejecutando seeds..."
-npx tsx prisma/seed.ts
-npx tsx prisma/seed-extra.ts
-npx tsx prisma/seed-configs.ts
-echo ""
-
-# 6. Build
-echo "🔨 [6/7] Compilando aplicación..."
+# 5. Build
+echo "🔨 [5/6] Compilando aplicación..."
 npm run build
 echo ""
 
-# 7. Reiniciar PM2
-echo "🚀 [7/7] Reiniciando servidor..."
+# 6. Reiniciar PM2
+echo "🚀 [6/6] Reiniciando servidor..."
 pm2 restart superencasa
 sleep 3
 echo ""
