@@ -25,8 +25,8 @@ export default function TopBenefits() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', width: '100%' }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '0' }}>
+    <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', width: '100%', overflowX: 'auto' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '16px', minWidth: 'max-content' }}>
         {BENEFITS.map((item, i) => (
           <div key={i} style={{
             display: 'flex', alignItems: 'center', gap: '12px',

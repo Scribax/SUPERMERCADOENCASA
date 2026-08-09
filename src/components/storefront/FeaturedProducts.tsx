@@ -26,7 +26,7 @@ export default function FeaturedProducts({ title, products }: FeaturedProductsPr
         </Link>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
+      <div className="responsive-product-grid">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

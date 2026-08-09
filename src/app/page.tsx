@@ -57,13 +57,13 @@ export default async function Home() {
       <section style={{ backgroundColor: '#E8EDF3', padding: '20px 16px 24px' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           {/* Fila: Sidebar | Banner (+ Affiliate flotante) */}
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch' }}>
-            <aside style={{ width: '230px', flexShrink: 0, display: 'flex' }}>
+          <div className="hero-layout-container">
+            <aside className="hero-sidebar-aside">
               <SidebarCategories categories={serializedCategories} />
             </aside>
             <div style={{ flex: 1, minWidth: 0, position: 'relative', display: 'flex' }}>
               <HeroBanner />
-              <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 20, width: '250px' }}>
+              <div className="hero-affiliate-overlay">
                 <HeroAffiliateCard />
               </div>
             </div>

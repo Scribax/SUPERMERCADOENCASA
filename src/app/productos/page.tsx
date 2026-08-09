@@ -316,7 +316,7 @@ function CatalogContent() {
 
             {/* Products Grid */}
             {loading ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '20px' }}>
+              <div className="responsive-product-grid">
                 {[1,2,3,4,5,6].map((n) => (
                   <div key={n} style={{ padding: '16px', borderRadius: '14px', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#FFFFFF' }}>
                     <div className="skeleton" style={{ height: '180px', borderRadius: '10px' }} />
@@ -339,7 +339,7 @@ function CatalogContent() {
               </div>
             ) : (
               <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '20px' }}>
+                <div className="responsive-product-grid">
                   {products.map((prod) => (
                     <ProductCard key={prod.id} product={prod} />
                   ))}
