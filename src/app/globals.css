@@ -97,6 +97,9 @@ html {
   height: 100%;
   scroll-behavior: smooth;
   color-scheme: light;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
 }
 
 html[data-theme='dark'] {
@@ -110,7 +113,10 @@ body {
   font-family: var(--font-secondary);
   font-size: 16px;
   line-height: 1.5;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  position: relative;
   display: flex;
   flex-direction: column;
   transition: background-color var(--transition-normal), color var(--transition-normal);

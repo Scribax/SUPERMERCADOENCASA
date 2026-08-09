@@ -98,9 +98,17 @@ export default function HeroBanner() {
         </motion.a>
       </div>
 
-      <div style={{ position: 'absolute', right: '-15px', bottom: '-5px', zIndex: 2, pointerEvents: 'none' }}>
+      <div className="hero-basket-img" style={{ position: 'absolute', right: '-15px', bottom: '-5px', zIndex: 2, pointerEvents: 'none' }}>
         <img src="/images/hero_shopping_basket.png" alt="Canasta" style={{ width: '340px', height: '340px', objectFit: 'contain', filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.35))' }} />
       </div>
+
+      <style jsx global>{`
+        @media (max-width: 991px) {
+          .hero-basket-img {
+            display: none !important;
+          }
+        }
+      `}</style>
 
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.18)', borderTop: '1px solid rgba(255,255,255,0.12)', padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', color: '#FFFFFF', zIndex: 10, backdropFilter: 'blur(8px)' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ fontSize: '16px' }}>🚚</span> Envío gratis<br /><span style={{ fontSize: '10px', opacity: 0.7 }}>en compras +$25.000</span></span>

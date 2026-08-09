@@ -53,8 +53,9 @@ export default async function Home() {
       <TopBenefits />
       <Header />
 
-      {/* HERO + CATEGORÍAS: todo integrado */}
-      <section style={{ backgroundColor: '#E8EDF3', padding: '20px 16px 24px' }}>
+      <div style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
+        {/* HERO + CATEGORÍAS: todo integrado */}
+        <section style={{ backgroundColor: '#E8EDF3', padding: '20px 16px 24px', width: '100%', overflowX: 'hidden' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           {/* Fila: Sidebar | Banner (+ Affiliate flotante) */}
           <div className="hero-layout-container">
@@ -84,6 +85,8 @@ export default async function Home() {
           <Benefits />
         </div>
       </main>
+
+      </div>
 
       <CityBar />
       <Footer />
