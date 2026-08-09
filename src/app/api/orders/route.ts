@@ -63,6 +63,8 @@ export async function POST(request: NextRequest) {
       customerPhone,
       shippingAddress,
       locality,
+      deliveryDate,
+      deliverySlot,
       paymentMethod, // MERCADO_PAGO, TRANSFER, CASH
     } = body;
 
@@ -192,6 +194,12 @@ export async function POST(request: NextRequest) {
       const dbLocality = await prisma.locality.findUnique({ where: { name: locality } });
       if (dbLocality && dbLocality.isActive) {
         configShippingCost = dbLocality.shippingCost;
+        if (dbLocality.minPurchase > 0 && subtotal < dbLocality.minPurchase) {
+          return NextResponse.json(
+            { error: `El monto mínimo de compra para envío a ${locality} es de $${dbLocality.minPurchase.toLocaleString('es-AR')}` },
+            { status: 400 }
+          );
+        }
       }
     }
 
@@ -215,8 +223,10 @@ export async function POST(request: NextRequest) {
           couponCode: validatedCouponCode,
           shippingAddress,
           locality: locality || null,
+          deliveryDate: deliveryDate || null,
+          deliverySlot: deliverySlot || null,
           paymentMethod,
-          paymentStatus: paymentMethod === 'CASH' ? 'PENDING' : 'PENDING', // PENDING initially, paid via MP redirect or manual transfer later
+          paymentStatus: paymentMethod === 'CASH' ? 'PENDING' : 'PENDING',
           customerName,
           customerEmail,
           customerPhone,
@@ -274,6 +284,19 @@ export async function POST(request: NextRequest) {
 
       return newOrder;
     });
+
+    // Send email notification asynchronously
+    try {
+      const { sendEmail, buildOrderEmailHtml } = await import('@/lib/email');
+      const emailHtml = buildOrderEmailHtml(order);
+      sendEmail({
+        to: customerEmail,
+        subject: `🛒 Confirmación de Pedido #${order.id.slice(0, 8)} - Superencasa`,
+        html: emailHtml,
+      }).catch(() => {});
+    } catch (e) {
+      console.error('Email helper import failed:', e);
+    }
 
     return NextResponse.json({ success: true, order });
   } catch (error: any) {

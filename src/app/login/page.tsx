@@ -211,6 +211,13 @@ function LoginContent() {
               />
               <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--foreground-muted)' }} />
             </div>
+            {isLoginTab && (
+              <div style={{ textAlign: 'right', marginTop: '6px' }}>
+                <Link href="/login/olvide-password" style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Submit button */}

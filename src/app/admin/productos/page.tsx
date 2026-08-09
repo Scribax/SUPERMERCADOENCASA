@@ -13,6 +13,7 @@ export default function AdminProducts() {
   // Filters / Search
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [lowStockOnly, setLowStockOnly] = useState(false);
 
   // Modal control
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -248,11 +249,12 @@ export default function AdminProducts() {
     }
   };
 
-  // Filter products based on search query and category
+  // Filter products based on search query, category, and low stock
   const filteredProducts = products.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
     const matchesCat = categoryFilter === '' || p.categoryId === categoryFilter;
-    return matchesSearch && matchesCat;
+    const matchesLowStock = !lowStockOnly || p.stock <= 5;
+    return matchesSearch && matchesCat && matchesLowStock;
   });
 
   if (loading) {
@@ -268,22 +270,43 @@ export default function AdminProducts() {
           <h1 style={{ fontSize: '28px', fontWeight: '800' }}>Catálogo de Productos</h1>
           <p style={{ color: 'var(--foreground-muted)' }}>Crea, edita, y actualiza el stock o los precios en oferta.</p>
         </div>
-        <button
-          onClick={handleOpenCreateModal}
-          style={{
-            backgroundColor: 'var(--primary)',
-            color: 'white',
-            padding: '12px 20px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '14px',
-            fontWeight: '700',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <Plus size={16} /> Nuevo Producto
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <a
+            href="/api/admin/export?type=products"
+            style={{
+              backgroundColor: '#0F172A',
+              color: 'white',
+              padding: '10px 16px',
+              borderRadius: 'var(--radius-md)',
+              fontWeight: '700',
+              textDecoration: 'none',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            📥 Exportar CSV
+          </a>
+          <button
+            onClick={handleOpenCreateModal}
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'white',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-md)',
+              fontWeight: '700',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            <Plus size={18} /> Nuevo Producto
+          </button>
+        </div>
       </div>
 
       {/* Toolbar filters */}
@@ -311,6 +334,26 @@ export default function AdminProducts() {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
+
+        {/* Low stock filter toggle */}
+        <button
+          onClick={() => setLowStockOnly(!lowStockOnly)}
+          style={{
+            padding: '10px 16px',
+            borderRadius: 'var(--radius-sm)',
+            border: lowStockOnly ? '1px solid #EF4444' : '1px solid var(--border)',
+            backgroundColor: lowStockOnly ? '#FEF2F2' : 'var(--background)',
+            color: lowStockOnly ? '#DC2626' : 'var(--foreground)',
+            fontWeight: '600',
+            fontSize: '13px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          {lowStockOnly ? '⚠️ Mostrando Stock Crítico (≤5)' : '🔴 Filtrar Stock Crítico'}
+        </button>
       </div>
 
       {/* Table */}

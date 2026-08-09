@@ -29,6 +29,8 @@ export default function CheckoutPage() {
 
   const [localities, setLocalities] = useState<any[]>([]);
 
+  const [deliveryDate, setDeliveryDate] = useState<string>('Hoy');
+  const [deliverySlot, setDeliverySlot] = useState<string>('Turno Mañana (09:00 - 12:00)');
   const [paymentMethod, setPaymentMethod] = useState<'MERCADO_PAGO' | 'TRANSFER' | 'CASH'>('MERCADO_PAGO');
   const [submitting, setSubmitting] = useState(false);
 
@@ -119,6 +121,8 @@ export default function CheckoutPage() {
         customerPhone: formData.telefono,
         shippingAddress: `${formData.direccion}, ${formData.ciudad}, ${formData.provincia} (CP: ${formData.zip})`,
         locality: localities.find(l => l.id === formData.localidadId)?.name || null,
+        deliveryDate,
+        deliverySlot,
         paymentMethod,
       };
 
@@ -304,10 +308,43 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Section 3: Payment Choice */}
+          {/* Section 3: Delivery Slot Choice */}
           <div style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
-              3. Método de Pago
+              3. Día y Horario de Entrega 🚚
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="grid-2-col">
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Fecha Preferida</label>
+                <select
+                  value={deliveryDate}
+                  onChange={(e) => setDeliveryDate(e.target.value)}
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
+                >
+                  <option value="Hoy">Hoy mismo</option>
+                  <option value="Mañana">Mañana</option>
+                  <option value="Pasado mañana">Pasado mañana</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', marginBottom: '6px' }}>Turno Horario</label>
+                <select
+                  value={deliverySlot}
+                  onChange={(e) => setDeliverySlot(e.target.value)}
+                  style={{ width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--background)' }}
+                >
+                  <option value="Turno Mañana (09:00 - 12:00)">Turno Mañana (09:00 - 12:00)</option>
+                  <option value="Turno Tarde (15:00 - 18:00)">Turno Tarde (15:00 - 18:00)</option>
+                  <option value="Turno Noche (18:00 - 21:00)">Turno Noche (18:00 - 21:00)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Payment Choice */}
+          <div style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+              4. Método de Pago
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Mercado Pago */}
