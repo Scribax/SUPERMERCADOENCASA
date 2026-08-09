@@ -22,6 +22,21 @@ export default function Navbar() {
   const [categories, setCategories] = useState<any[]>([]);
   const [showMegaMenu, setShowMegaMenu] = useState(false);
 
+  // WhatsApp State
+  const [whatsapp, setWhatsapp] = useState('5492923651516');
+
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.config?.whatsapp_number) {
+          const raw = data.config.whatsapp_number.replace(/[^0-9]/g, '');
+          if (raw) setWhatsapp(raw);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Theme State
   const [theme, setTheme] = useState('light');
 
@@ -121,7 +136,7 @@ export default function Navbar() {
               <span style={{ fontSize: '14px' }}>🎧</span> <strong>Atención personalizada:</strong> Soporte directo por WhatsApp y email.
             </span>
           </div>
-          <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#7CB518', color: 'white', padding: '4px 12px', borderRadius: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
+          <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#7CB518', color: 'white', padding: '4px 12px', borderRadius: '12px', fontWeight: 'bold', textDecoration: 'none' }}>
             🟢 ¿Necesitás ayuda? Escribinos por WhatsApp
           </a>
         </div>

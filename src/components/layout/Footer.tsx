@@ -7,7 +7,7 @@ import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('+54 9 11 2233-4455');
+  const [phone, setPhone] = useState('+54 9 2923 651516');
   const [supportEmail, setSupportEmail] = useState('soporte@superencasa.com');
   const [hours, setHours] = useState('Lunes a Sábado de 08:00 a 21:00 hs');
   const [categories, setCategories] = useState<any[]>([]);

@@ -216,7 +216,7 @@ export default function CheckoutPage() {
                 <input
                   type="tel"
                   name="telefono"
-                  placeholder="Ej: +5491122334455"
+                  placeholder="Ej: +54 9 2923 651516"
                   value={formData.telefono}
                   onChange={handleInputChange}
                   required

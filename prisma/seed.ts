@@ -26,7 +26,7 @@ async function main() {
       role: 'ADMIN',
       profile: {
         create: {
-          phone: '+5491122334455',
+          phone: '+54 9 2923 651516',
           avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
         },
       },
@@ -48,7 +48,7 @@ async function main() {
     { key: 'store_name', value: 'Superencasa' },
     { key: 'shipping_cost', value: '290' },
     { key: 'free_shipping_threshold', value: '4500' },
-    { key: 'whatsapp_number', value: '+5491122334455' },
+    { key: 'whatsapp_number', value: '+54 9 2923 651516' },
     { key: 'support_email', value: 'soporte@superencasa.com' },
     { key: 'instagram_url', value: 'https://instagram.com/superencasa' },
     { key: 'facebook_url', value: 'https://facebook.com/superencasa' },

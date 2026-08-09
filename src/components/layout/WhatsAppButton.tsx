@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 
 export default function WhatsAppButton() {
-  const [phone, setPhone] = useState('+5491122334455');
+  const [phone, setPhone] = useState('5492923651516');
   const [storeName, setStoreName] = useState('Superencasa');
 
   useEffect(() => {
