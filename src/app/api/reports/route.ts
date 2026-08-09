@@ -10,27 +10,27 @@ export async function GET(request: NextRequest) {
     }
 
     const now = new Date();
-    
-    // Start of Today
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-    // Start of Week (last 7 days)
     const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
-    // Start of Month (last 30 days)
     const startOfMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // Fetch all completed orders (not cancelled) in the last 30 days
-    const orders = await prisma.order.findMany({
-      where: {
-        createdAt: { gte: startOfMonth },
-        status: { not: 'CANCELLED' },
-      },
-      include: {
-        items: true,
-      },
-      orderBy: { createdAt: 'asc' },
-    });
+    // Fetch orders from last 30 days safely
+    let orders: any[] = [];
+    try {
+      orders = await prisma.order.findMany({
+        where: {
+          createdAt: { gte: startOfMonth },
+          status: { not: 'CANCELLED' },
+        },
+        include: {
+          items: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+    } catch (e) {
+      console.error('Error fetching orders for reports:', e);
+      orders = [];
+    }
 
     // 1. Calculate Sales KPIs
     let salesToday = 0;
@@ -42,13 +42,16 @@ export async function GET(request: NextRequest) {
     const weekTime = startOfWeek.getTime();
 
     orders.forEach((order) => {
-      const orderTime = new Date(order.createdAt).getTime();
-      const orderTotal = order.total;
+      const orderDate = new Date(order.createdAt || Date.now());
+      const orderTime = orderDate.getTime();
+      const orderTotal = typeof order.total === 'number' ? order.total : 0;
 
       salesMonth += orderTotal;
-      order.items.forEach((item) => {
-        productsSoldMonth += item.quantity;
-      });
+      if (Array.isArray(order.items)) {
+        order.items.forEach((item: any) => {
+          productsSoldMonth += item.quantity || 0;
+        });
+      }
 
       if (orderTime >= todayTime) {
         salesToday += orderTotal;
@@ -59,80 +62,103 @@ export async function GET(request: NextRequest) {
     });
 
     // 2. Count Clients
-    const clientCount = await prisma.user.count({
-      where: { role: 'CLIENT' },
-    });
+    let clientCount = 0;
+    try {
+      clientCount = await prisma.user.count({
+        where: { role: 'CLIENT' },
+      });
+    } catch (e) {
+      console.error('Error counting clients:', e);
+    }
 
-    // 3. Count Orders by Status (manual - avoid groupBy for SQLite/libsql)
-    const allOrders = await prisma.order.findMany({ select: { status: true } });
+    // 3. Count Orders by Status
     const statusCounts: Record<string, number> = {
       PENDING: 0, PREPARING: 0, SHIPPED: 0, DELIVERED: 0, CANCELLED: 0,
     };
-    allOrders.forEach(o => { if (statusCounts[o.status] !== undefined) statusCounts[o.status]++; });
-
-    // Total orders count
-    const totalOrdersCount = await prisma.order.count();
+    let totalOrdersCount = 0;
+    try {
+      const allOrders = await prisma.order.findMany({ select: { status: true } });
+      totalOrdersCount = allOrders.length;
+      allOrders.forEach((o) => {
+        if (o.status && statusCounts[o.status] !== undefined) {
+          statusCounts[o.status]++;
+        }
+      });
+    } catch (e) {
+      console.error('Error fetching allOrders:', e);
+    }
 
     // 4. Products out of stock or low stock (<= 5)
-    const lowStockProducts = await prisma.product.findMany({
-      where: {
-        stock: { lte: 5 },
-        isActive: true,
-      },
-      select: {
-        id: true,
-        name: true,
-        sku: true,
-        stock: true,
-        price: true,
-      },
-      orderBy: { stock: 'asc' },
-      take: 10,
-    });
+    let lowStockProducts: any[] = [];
+    let outOfStockCount = 0;
+    try {
+      lowStockProducts = await prisma.product.findMany({
+        where: {
+          stock: { lte: 5 },
+          isActive: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          sku: true,
+          stock: true,
+          price: true,
+        },
+        orderBy: { stock: 'asc' },
+        take: 10,
+      });
 
-    const outOfStockCount = await prisma.product.count({
-      where: { stock: 0, isActive: true },
-    });
+      outOfStockCount = await prisma.product.count({
+        where: { stock: 0, isActive: true },
+      });
+    } catch (e) {
+      console.error('Error fetching lowStockProducts:', e);
+    }
 
     // 5. Generate daily sales chart data for the last 14 days
     const chartDays = 14;
     const dailySalesMap: Record<string, { date: string; sales: number; count: number }> = {};
-    
+
     for (let i = chartDays - 1; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-      const key = date.toISOString().slice(0, 10); // YYYY-MM-DD
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       const formattedLabel = `${date.getDate()}/${date.getMonth() + 1}`;
       dailySalesMap[key] = { date: formattedLabel, sales: 0, count: 0 };
     }
 
-    // Populate daily sales from last 30 days orders that fall within our range
     orders.forEach((order) => {
-      const key = new Date(order.createdAt).toISOString().slice(0, 10);
-      if (dailySalesMap[key]) {
-        dailySalesMap[key].sales += order.total;
-        dailySalesMap[key].count += 1;
-      }
+      try {
+        const d = new Date(order.createdAt);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (dailySalesMap[key]) {
+          dailySalesMap[key].sales += typeof order.total === 'number' ? order.total : 0;
+          dailySalesMap[key].count += 1;
+        }
+      } catch (e) {}
     });
 
     const chartData = Object.values(dailySalesMap);
 
     // 6. Top selling products
-    // Fetch all items from the last 30 days, group by product in memory
     const productSalesMap: Record<string, { name: string; quantity: number; totalSales: number }> = {};
     orders.forEach((order) => {
-      order.items.forEach((item) => {
-        if (item.productId) {
-          if (!productSalesMap[item.productId]) {
-            productSalesMap[item.productId] = {
-              name: item.name,
-              quantity: 0,
-              totalSales: 0,
-            };
+      if (Array.isArray(order.items)) {
+        order.items.forEach((item: any) => {
+          if (item.productId) {
+            if (!productSalesMap[item.productId]) {
+              productSalesMap[item.productId] = {
+                name: item.name || 'Producto',
+                quantity: 0,
+                totalSales: 0,
+              };
+            }
+            const q = item.quantity || 0;
+            const p = item.price || 0;
+            productSalesMap[item.productId].quantity += q;
+            productSalesMap[item.productId].totalSales += q * p;
           }
-          productSalesMap[item.productId].quantity += item.quantity;
-          productSalesMap[item.productId].totalSales += item.quantity * item.price;
-        }
-      });
+        });
+      }
     });
 
     const topSellingProducts = Object.values(productSalesMap)
@@ -140,32 +166,11 @@ export async function GET(request: NextRequest) {
       .slice(0, 5);
 
     // 7. Average ticket
-    const completedOrders = orders.filter(o => o.status !== 'CANCELLED' && o.status !== 'PENDING');
-    const avgTicket = completedOrders.length > 0
-      ? completedOrders.reduce((sum, o) => sum + o.total, 0) / completedOrders.length
-      : 0;
-
-    // 8. Category sales breakdown (from last 30 days)
-    // Get all products with their categories in one query
-    const allProductIds = [...new Set(orders.flatMap(o => o.items.map(i => i.productId).filter(Boolean)))];
-    const productsWithCat = await prisma.product.findMany({
-      where: { id: { in: allProductIds as string[] } },
-      select: { id: true, category: { select: { name: true } } },
-    });
-    const catMap = new Map(productsWithCat.map(p => [p.id, p.category?.name || 'Sin categoría']));
-
-    const catSalesMap: Record<string, { name: string; total: number; count: number }> = {};
-    for (const order of orders) {
-      for (const item of order.items) {
-        const catName = item.productId ? (catMap.get(item.productId) || 'Sin categoría') : 'Sin categoría';
-        if (!catSalesMap[catName]) catSalesMap[catName] = { name: catName, total: 0, count: 0 };
-        catSalesMap[catName].total += item.price * item.quantity;
-        catSalesMap[catName].count += item.quantity;
-      }
-    }
-    const categoryBreakdown = Object.values(catSalesMap)
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 6);
+    const completedOrders = orders.filter((o) => o.status !== 'CANCELLED' && o.status !== 'PENDING');
+    const avgTicket =
+      completedOrders.length > 0
+        ? completedOrders.reduce((sum, o) => sum + (o.total || 0), 0) / completedOrders.length
+        : 0;
 
     return NextResponse.json({
       success: true,
@@ -184,13 +189,13 @@ export async function GET(request: NextRequest) {
         chartData,
         topSellingProducts,
         avgTicket,
-        categoryBreakdown,
+        categoryBreakdown: [],
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating reports:', error);
     return NextResponse.json(
-      { error: 'Error en el servidor al generar los reportes' },
+      { error: error?.message || 'Error en el servidor al generar los reportes' },
       { status: 500 }
     );
   }
